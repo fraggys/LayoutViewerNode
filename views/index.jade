@@ -1,0 +1,18 @@
+doctype html
+html
+  head
+    title Layout Editor App
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge,chrome=1")
+    meta(name="viewport", content="width=device-width")
+    link(rel='stylesheet', href='/stylesheets/main.css')
+    link(rel='stylesheet', href='/stylesheets/base/jquery-ui.css')
+    script(src = "js/lib/angular.js")
+    script(src = "js/lib/jquery.js")
+    script(src = "js/lib/jquery-ui.js")
+    script(src = "js/layoutEditorApp.js")
+    script(src = "js/controllers/main.js")
+    script(src = "js/directives/jui.js")
+  body(ng-app="layoutEditorApp")
+    .container(ng-view)
+

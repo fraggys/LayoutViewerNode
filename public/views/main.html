@@ -1,0 +1,39 @@
+<div class="header">
+    <label class="text">Barco</label>
+    <select ng-model="layoutName"
+            ng-options="opt as opt.label for opt in options">
+    </select>
+    <input type="text" ng-model="layoutName.value" />
+    <button id="saveBtn" ng-click="saveLayout()">Save</button>
+</div>
+        <div><br><br></div>
+<div>
+    <button id="addBtn" ng-click="addSourceArea()">Add Region</button>
+</div>
+<div class="parent">
+    <source ng-repeat="(id,source) in layoutObject" source-data="source"/>
+
+    <div id="dialogWindow" jui-dialog jui-options='{
+        "dialog": {
+            "autoOpen": false,
+            "modal": true,
+            "resizable": false,
+            "draggable": false
+        }
+    }'>
+        <fieldset>
+            <label for="posX">X:</label>
+            <input id="posX" type="text" ng-model="activeObject.insertion.posX">
+            <label for="posY">Y:</label>
+            <input id="posY" type="text" ng-model="activeObject.insertion.posY">
+            <label for="width">Width:</label>
+            <input id="width" type="text" ng-model="activeObject.insertion.width">
+            <label for="height">Height:</label>
+            <input id="height" type="text" ng-model="activeObject.insertion.height">
+            <label for="deviceId">Device ID:</label>
+            <input id="deviceId" type="text" ng-model="activeObject.insertion.sourceRef.deviceId">
+            <label for="channelId">Channel ID:</label>
+            <input id="channelId" type="text" ng-model="activeObject.insertion.sourceRef.channelId">
+        </fieldset>
+    </div>
+</div>

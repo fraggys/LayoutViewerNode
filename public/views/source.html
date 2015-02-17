@@ -1,0 +1,10 @@
+<div id="{{sourceData.id}}" jui-draggable jui-resizable jui-options='{
+    "resizable":{
+        "containment":".parent"
+      },
+      "draggable":{
+        "containment":".parent"
+      }
+  }' on-stop="calcPosition" ng-dblclick="openDialogWindow()" class="source">
+{{ sourceData }}
+</div>
