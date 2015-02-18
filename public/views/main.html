@@ -1,17 +1,17 @@
 <div class="header">
     <label class="text">Barco</label>
-    <select ng-model="layoutName"
+    <select ng-model="layoutMaster"
             ng-options="opt as opt.label for opt in options">
     </select>
-    <input type="text" ng-model="layoutName.value" />
+    <input type="text" ng-model="layoutMaster.label" ng-disabled="!layoutMaster.value"/>
     <button id="saveBtn" ng-click="saveLayout()">Save</button>
 </div>
         <div><br><br></div>
 <div>
-    <button id="addBtn" ng-click="addSourceArea()">Add Region</button>
+    <button id="addBtn" ng-click="addSourceArea()" ng-disabled="!layoutMaster.value">Add Region</button>
 </div>
 <div class="parent">
-    <source ng-repeat="(id,source) in layoutObject" source-data="source"/>
+    <source ng-repeat="(id,source) in layoutMaster.value" source-data="source"/>
 
     <div id="dialogWindow" jui-dialog jui-options='{
         "dialog": {

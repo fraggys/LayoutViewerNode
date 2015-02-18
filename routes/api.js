@@ -7,21 +7,21 @@ var cngClient = require('../lib/cngClient');
 /*return compostion list*/
 router.get('/compositions', function (req, res, next) {
     cngClient.client.getCompositions(function (result) {
-        res.send(result);
+        res.json(result);
     });
 });
 
 /*returns array of sources*/
 router.get('/sources', function (req, res, next) {
     cngClient.client.getSources("screen", function (result) {
-        res.send(result.source);
+        res.json(result.source);
     });
 });
 
 /*returns array of layouts*/
 router.get('/layouts', function (req, res, next) {
     cngClient.client.getCustomLayouts("screen", function (result) {
-        res.send(result);
+        res.json(result);
     });
 });
 
@@ -29,7 +29,7 @@ router.get('/layouts', function (req, res, next) {
 router.get('/layout', function (req, res, next) {
     layout = {
         $: {
-            "title":"2sources"
+            "title":"Two sources"
         },
         "Insertion":[ {
             $: {
@@ -60,7 +60,7 @@ router.get('/layout', function (req, res, next) {
         }]
     };
     cngClient.client.addLayout(layout, function (result) {
-        res.send(result);
+        res.json(result);
     });
 });
 

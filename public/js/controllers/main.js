@@ -1,14 +1,28 @@
 'use strict';
 
-layoutEditorApp.controller('MainCtrl', function ($scope) {
+layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
     $scope.options = [
-        { label: 'Change Layout', value: '' }
+        {label: 'Change Layout', value: ''},
+        {label: 'Create New Layout', value:{}}
     ];
-    $scope.layoutName = $scope.options[0];
+    $http.get('/api/layouts')
+        .success(function (data, status, headers, config) {
+            data.forEach(function (layout) {
+                $scope.options.push({
+                    label: layout.$.title,
+                    value: createSourceAreaFromLayoutData(layout.Insertion)
+                });
+            });
+        })
+        .error(function (data, status, headers, config) {
+            //TODO handle error
+        });
+    //init select-menu.
+    $scope.layoutMaster = $scope.options[0];
 
     $("#addBtn").button({
-        icons:{
-            primary:"ui-icon-plus"
+        icons: {
+            primary: "ui-icon-plus"
         }
     });
     $("#saveBtn").button({
@@ -16,17 +30,18 @@ layoutEditorApp.controller('MainCtrl', function ($scope) {
             primary: "ui-icon-disk"
         }
     });
-    $scope.layoutObject = {};
-    $scope.$watch('activeObject', function(newVal){
-        if(newVal){
-            var id = '#'+newVal.id;
-            $(id).offset({"top":newVal.insertion.posY,"left":newVal.insertion.posX})
-                 .outerWidth(newVal.insertion.width)
-                 .outerHeight(newVal.insertion.height);
+    $scope.originX= ($(".parent")[0].offsetLeft)+2;
+    $scope.originY= ($(".parent")[0].offsetTop)+2;
+    $scope.$watch('activeObject', function (newVal) {
+        if (newVal) {
+            var id = '#' + newVal.id;
+            $(id).offset({"top": newVal.insertion.posY, "left": newVal.insertion.posX})
+                .outerWidth(newVal.insertion.width)
+                .outerHeight(newVal.insertion.height);
         }
-    },true);
+    }, true);
     $scope.addSourceArea = function () {
-      var id = new Date().getTime();
+        var id = generateSrcAreaId();
         var srcArea = {
             id: id,
             insertion: {
@@ -40,12 +55,36 @@ layoutEditorApp.controller('MainCtrl', function ($scope) {
                 }
             }
         };
-        $scope.layoutObject[id]=srcArea;
+        console.log($scope.layoutMaster.value);
+        $scope.layoutMaster.value[id] = srcArea;
     };
-    $scope.saveLayout =  function () {
+    $scope.saveLayout = function () {
         console.dir($scope.layoutObject);
         console.dir($scope.layoutName);
     };
+
+    /*util functions for backend data mapping*/
+
+    function generateSrcAreaId(){
+        return new Date().getTime();
+    }
+    function createSourceAreaFromLayoutData(insertionArr) {
+        var retObj = {};
+        insertionArr.forEach(function (entry) {
+            var srcAreaObj = {};
+            srcAreaObj.id = generateSrcAreaId();
+            srcAreaObj.insertion = {};
+            srcAreaObj.insertion.posX = entry.$.x;
+            srcAreaObj.insertion.posY = entry.$.y;
+            srcAreaObj.insertion.height = entry.$.height;
+            srcAreaObj.insertion.width = entry.$.width;
+            srcAreaObj.insertion.sourceRef = {};
+            srcAreaObj.insertion.sourceRef.deviceId = entry.SourceRef[0].$.deviceId;
+            srcAreaObj.insertion.sourceRef.channelId = entry.SourceRef[0].$.channelId;
+            retObj[srcAreaObj.id] = srcAreaObj;
+        });
+        return retObj;
+    }
 });
 
 layoutEditorApp.directive('source', function source() {
@@ -57,7 +96,7 @@ layoutEditorApp.directive('source', function source() {
         scope: {
             sourceData: '='
         },
-        link:function(scope,elem,attr){
+        link: function (scope, elem, attr) {
             scope.sourceData.insertion.posX = elem[0].offsetLeft;
             scope.sourceData.insertion.posY = elem[0].offsetTop;
             scope.sourceData.insertion.width = elem[0].offsetWidth;
