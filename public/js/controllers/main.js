@@ -31,6 +31,21 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         }
     });
 
+    $("#source").contextmenu({
+        delegate: ".hasmenu",
+        menu: [
+            {title: "Copy", cmd: "copy", uiIcon: "ui-icon-copy"},
+            {title: "----"},
+            {title: "More", children: [
+                {title: "Sub 1", cmd: "sub1"},
+                {title: "Sub 2", cmd: "sub1"}
+            ]}
+        ],
+        select: function(event, ui) {
+            alert("select " + ui.cmd + " on " + ui.target.text());
+        }
+    });
+
     //keep parentElemDimensions
     var parentElem = $(".parent")[0];
     $scope.canvasX = (parentElem.offsetLeft) + 2;
