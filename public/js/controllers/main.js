@@ -3,7 +3,7 @@
 layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
     $scope.options = [
         {label: 'Change Layout', value: ''},
-        {label: 'Create New Layout', value:{}}
+        {label: 'Create New Layout', value: {}}
     ];
     $http.get('/api/layouts')
         .success(function (data, status, headers, config) {
@@ -30,8 +30,14 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             primary: "ui-icon-disk"
         }
     });
-    $scope.originX= ($(".parent")[0].offsetLeft)+2;
-    $scope.originY= ($(".parent")[0].offsetTop)+2;
+
+    //keep parentElemDimensions
+    var parentElem = $(".parent")[0];
+    $scope.canvasX = (parentElem.offsetLeft) + 2;
+    $scope.canvasY = (parentElem.offsetTop) + 2;
+    $scope.canvasW = (parentElem).offsetWidth;
+    $scope.canvasH = (parentElem).offsetHeight;
+
     $scope.$watch('activeObject', function (newVal) {
         if (newVal) {
             var id = '#' + newVal.id;
@@ -40,13 +46,18 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 .outerHeight(newVal.insertion.height);
         }
     }, true);
+
     $scope.addSourceArea = function () {
-        var id = generateSrcAreaId();
+        var id = generateUUId();
         var srcArea = {
             id: id,
             insertion: {
                 posX: "",
                 posY: "",
+                relX: "",
+                relY: "",
+                relW:"",
+                relH:"",
                 width: "",
                 height: "",
                 sourceRef: {
@@ -58,21 +69,26 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         console.log($scope.layoutMaster.value);
         $scope.layoutMaster.value[id] = srcArea;
     };
-    $scope.saveLayout = function () {
-        console.dir($scope.layoutObject);
-        console.dir($scope.layoutName);
-    };
 
     /*util functions for backend data mapping*/
 
-    function generateSrcAreaId(){
+    $scope.saveLayout = function () {
+        createLayoutObjectFromSourceArea($scope.layoutMaster.label, $scope.layoutMaster.value);
+    };
+
+    function calcAbsDim(){}
+    function calcRelDim(){}
+
+
+    function generateUUId() {
         return new Date().getTime();
     }
+
     function createSourceAreaFromLayoutData(insertionArr) {
         var retObj = {};
         insertionArr.forEach(function (entry) {
             var srcAreaObj = {};
-            srcAreaObj.id = generateSrcAreaId();
+            srcAreaObj.id = generateUUId();
             srcAreaObj.insertion = {};
             srcAreaObj.insertion.posX = entry.$.x;
             srcAreaObj.insertion.posY = entry.$.y;
@@ -84,6 +100,33 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             retObj[srcAreaObj.id] = srcAreaObj;
         });
         return retObj;
+    }
+
+    function createLayoutObjectFromSourceArea(layoutName, layoutData) {
+        var layout = {
+            "title": layoutName,
+            "Insertion" :[]
+        };
+        if (layoutData) {
+            for (var id in layoutData) {
+                var insert = layoutData[id].insertion;
+                layout.Insertion.push({
+                        "x": (insert.posX - $scope.canvasX)/$scope.canvasW,
+                        "y": (insert.posY - $scope.canvasY)/$scope.canvasH,
+                        "width": (insert.width/$scope.canvasW),
+                        "height": (insert.height/$scope.canvasH),
+                        "sourceRef": insert.sourceRef
+                });
+            }
+        }
+        $http.post('/api/layout', layout)
+            .success(function (data, status, headers, config) {
+                console.log("success while posting layout data");
+            })
+            .error(function (data, status, headers, config) {
+                console.log("whoa server blew up");
+            });
+
     }
 });
 
