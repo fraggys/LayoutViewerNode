@@ -31,27 +31,22 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         }
     });
 
-    $("#source").contextmenu({
-        delegate: ".hasmenu",
-        menu: [
-            {title: "Copy", cmd: "copy", uiIcon: "ui-icon-copy"},
-            {title: "----"},
-            {title: "More", children: [
-                {title: "Sub 1", cmd: "sub1"},
-                {title: "Sub 2", cmd: "sub1"}
-            ]}
-        ],
-        select: function(event, ui) {
-            alert("select " + ui.cmd + " on " + ui.target.text());
-        }
-    });
-
     //keep parentElemDimensions
     var parentElem = $(".parent")[0];
     $scope.canvasX = (parentElem.offsetLeft) + 2;
     $scope.canvasY = (parentElem.offsetTop) + 2;
     $scope.canvasW = (parentElem).offsetWidth;
     $scope.canvasH = (parentElem).offsetHeight;
+    $(".parent").contextmenu({
+        delegate: ".source",
+        menu: [
+            {title: "Move to top", cmd: "copy", uiIcon: "ui-icon-arrowstop-1-n"},
+            {title: "Move to bottom", cmd: "copy", uiIcon: "ui-icon-arrowstop-1-s"}
+        ],
+        select: function(event, ui) {
+            alert("select " + ui.cmd + " on " + ui.target.text());
+        }
+    });
 
     $scope.$watch('activeObject', function (newVal) {
         if (newVal) {
@@ -71,8 +66,8 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 posY: "",
                 relX: "",
                 relY: "",
-                relW:"",
-                relH:"",
+                relW: "",
+                relH: "",
                 width: "",
                 height: "",
                 sourceRef: {
@@ -81,7 +76,6 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 }
             }
         };
-        console.log($scope.layoutMaster.value);
         $scope.layoutMaster.value[id] = srcArea;
     };
 
@@ -91,8 +85,11 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         createLayoutObjectFromSourceArea($scope.layoutMaster.label, $scope.layoutMaster.value);
     };
 
-    function calcAbsDim(){}
-    function calcRelDim(){}
+    function calcAbsDim() {
+    }
+
+    function calcRelDim() {
+    }
 
 
     function generateUUId() {
@@ -120,17 +117,17 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
     function createLayoutObjectFromSourceArea(layoutName, layoutData) {
         var layout = {
             "title": layoutName,
-            "Insertion" :[]
+            "Insertion": []
         };
         if (layoutData) {
             for (var id in layoutData) {
                 var insert = layoutData[id].insertion;
                 layout.Insertion.push({
-                        "x": (insert.posX - $scope.canvasX)/$scope.canvasW,
-                        "y": (insert.posY - $scope.canvasY)/$scope.canvasH,
-                        "width": (insert.width/$scope.canvasW),
-                        "height": (insert.height/$scope.canvasH),
-                        "sourceRef": insert.sourceRef
+                    "x": (insert.posX - $scope.canvasX) / $scope.canvasW,
+                    "y": (insert.posY - $scope.canvasY) / $scope.canvasH,
+                    "width": (insert.width / $scope.canvasW),
+                    "height": (insert.height / $scope.canvasH),
+                    "sourceRef": insert.sourceRef
                 });
             }
         }
