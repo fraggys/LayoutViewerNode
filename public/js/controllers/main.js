@@ -1,10 +1,13 @@
 'use strict';
 
 layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
+
     $scope.options = [
         {label: 'Change Layout', value: ''},
-        {label: 'Create New Layout', value: {}}
+        {label: 'Create New Layout', value: []}
     ];
+
+    //get layout list from server
     $http.get('/api/layouts')
         .success(function (data, status, headers, config) {
             data.forEach(function (layout) {
@@ -31,12 +34,13 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         }
     });
 
-    //keep parentElemDimensions
+    //keep parentElemDimensions in the scope
     var parentElem = $(".parent")[0];
     $scope.canvasW = (parentElem).offsetWidth;
     $scope.canvasH = (parentElem).offsetHeight;
     $scope.canvasX = parentElem.offsetLeft + 2;
     $scope.canvasY = parentElem.offsetTop + 2;
+
     $(".parent").contextmenu({
         delegate: ".source",
         menu: [
@@ -45,8 +49,26 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         ],
         select: function(event, ui) {
             alert("select " + ui.cmd + " on " + ui.target.text());
-        }
+        },
+        preventContextMenuForPopup:true,
+        beforeOpen: function(event, ui) {
+            console.dir(event);
+    }
     });
+
+    /*Dialog window controls and logic refactor to move out at later time.*/
+    $scope.srcTypeOptions = [
+        {label: 'Insertion', value: 'Insertion'},
+        {label: 'Region', value: 'Region'}
+    ];
+    $scope.blinkSpeedOptions = [
+        {label: 'None', value: 'None'},
+        {label: 'Super Slow', value: 'superSlow'},
+        {label: 'Slow', value: 'slow'},
+        {label: 'Medium', value: 'medium'},
+        {label: 'Fast', value: 'fast'},
+        {label: 'Very Fast', value: 'veryFast'},
+    ];
 
     $scope.$watch('activeObject', function (newVal) {
         if (newVal) {
@@ -63,21 +85,35 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         var srcArea = {
             id: id,
             insertion: {
+                type:"",
                 posX: "",
                 posY: "",
-                relX: "",
-                relY: "",
-                relW:"",
-                relH:"",
                 width: "",
                 height: "",
+                zIndex: "",
                 sourceRef: {
                     deviceId: "",
                     channelId: ""
+                },
+                border:{
+                    thickness:"",
+                    color:"",
+                    blinkSpeed:$scope.blinkSpeedOptions[0].value
+                },
+                annotation:{
+                    text:"",
+                    size:0,
+                    font: {
+                        wt:0,
+                        italic:false,
+                        position:"",
+                        color:"",
+                        bgColor:""
+                    }
                 }
             }
         };
-        $scope.layoutMaster.value[id] = srcArea;
+        $scope.layoutMaster.value.push(srcArea);
     };
 
     /*util functions for backend data mapping*/
@@ -86,19 +122,12 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         createLayoutObjectFromSourceArea($scope.layoutMaster.label, $scope.layoutMaster.value);
     };
 
-    function calcAbsDim() {
-    }
-
-    function calcRelDim() {
-    }
-
-
     function generateUUId() {
         return new Date().getTime();
     }
 
     function createSourceAreaFromLayoutData(insertionArr) {
-        var retObj = {};
+        var retObj = [];
         if(insertionArr){
         insertionArr.forEach(function (entry) {
             var srcAreaObj = {};
@@ -111,7 +140,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             srcAreaObj.insertion.sourceRef = {};
             srcAreaObj.insertion.sourceRef.deviceId = entry.SourceRef[0].$.deviceId;
             srcAreaObj.insertion.sourceRef.channelId = entry.SourceRef[0].$.channelId;
-            retObj[srcAreaObj.id] = srcAreaObj;
+            retObj.push(srcAreaObj);
         });
         }
         return retObj;
@@ -123,16 +152,17 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             "Insertion": []
         };
         if (layoutData) {
-            for (var id in layoutData) {
-                var insert = layoutData[id].insertion;
+            layoutData.forEach(function(entry) {
+                console.log($scope.canvasH)
+                var insert = entry.insertion;
                 layout.Insertion.push({
                     "x": (insert.posX - $scope.canvasX) / $scope.canvasW,
-                    "y": (insert.posY - $scope.canvasY) / $scope.canvasH,
+                    "y": ($scope.canvasY+$scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
                     "width": (insert.width / $scope.canvasW),
                     "height": (insert.height / $scope.canvasH),
                     "sourceRef": insert.sourceRef
                 });
-            }
+            });
         }
         $http.post('/api/layout', layout)
             .success(function (data, status, headers, config) {
@@ -143,6 +173,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             });
 
     }
+
 });
 
 layoutEditorApp.directive('source', function source() {
@@ -155,6 +186,7 @@ layoutEditorApp.directive('source', function source() {
             sourceData: '='
         },
         link: function (scope, elem, attr) {
+            console.dir(scope);
             scope.sourceData.insertion.posX = elem[0].offsetLeft;
             scope.sourceData.insertion.posY = elem[0].offsetTop;
             scope.sourceData.insertion.width = elem[0].offsetWidth;

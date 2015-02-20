@@ -9,31 +9,65 @@
 <div class=".ui-widget-content">
     <br/><br/><br/>
     <button id="addBtn" ng-click="addSourceArea()" ng-disabled="!layoutMaster.value">Add Region</button>
-<div class="parent">
-    <source ng-repeat="(id,source) in layoutMaster.value" source-data="source"/>
-
-    <div id="dialogWindow" title="Source Properties" jui-dialog jui-options='{
+    <div class="parent">
+        <source ng-repeat="source in layoutMaster.value" source-data="source"/>
+    </div>
+    <div id="dialogWindow" title="Source Properties" class="ui-widget" jui-dialog jui-options='{
         "dialog": {
             "autoOpen": false,
+            "height": 700,
+            "width": 500,
             "modal": true,
             "resizable": false,
             "draggable": false
         }
     }'>
         <fieldset>
+            <label for="srcType">Source Type: </label>
+            <select id="srcType" ng-model="activeObject.insertion.type"
+                    ng-options="opt as opt.label for opt in srcTypeOptions">
+            </select><br/>
             <label for="posX">X:</label>
-            <input id="posX" type="text" ng-model="activeObject.insertion.posX">
+            <input id="posX" type="text" ng-model="activeObject.insertion.posX"><br/>
             <label for="posY">Y:</label>
-            <input id="posY" type="text" ng-model="activeObject.insertion.posY">
+            <input id="posY" type="text" ng-model="activeObject.insertion.posY"><br/>
             <label for="width">Width:</label>
-            <input id="width" type="text" ng-model="activeObject.insertion.width">
+            <input id="width" type="text" ng-model="activeObject.insertion.width"><br/>
             <label for="height">Height:</label>
-            <input id="height" type="text" ng-model="activeObject.insertion.height">
+            <input id="height" type="text" ng-model="activeObject.insertion.height"><br/>
             <label for="deviceId">Device ID:</label>
-            <input id="deviceId" type="text" ng-model="activeObject.insertion.sourceRef.deviceId">
+            <input id="deviceId" type="text" ng-model="activeObject.insertion.sourceRef.deviceId"><br/>
             <label for="channelId">Channel ID:</label>
-            <input id="channelId" type="text" ng-model="activeObject.insertion.sourceRef.channelId">
+            <input id="channelId" type="text" ng-model="activeObject.insertion.sourceRef.channelId"><br/>
+            <br>
+            <h4>Source Border Properties:</h4>
+            <hr>
+            <label for="borderWt">Border Thickness</label>
+            <input id="borderWt" type="text" ng-model="activeObject.insertion.border.thickness"><br>
+            <label for="borderClr">Border Color:</label>
+            <input id="borderClr" type="color" ng-model="activeObject.insertion.border.color"><br>
+            <label for="borderBlink">Border Blink Speed:</label>
+            <select id="borderBlink" ng-model="activeObject.insertion.border.blinkSpeed"
+                    ng-options="opt as opt.label for opt in blinkSpeedOptions">
+            </select><br/>
+            <br>
+            <h4>Source Annotation Properties:</h4>
+            <hr>
+            <label for="annText">Text:</label>
+            <input id="annText" type="text" ng-model="activeObject.insertion.annotation.text"><br/>
+            <label for="annSize">Size:</label>
+            <input id="annSize" type="text" ng-model="activeObject.insertion.annotation.size"><br/>
+            <label for="annFntWt">Font Weight:</label>
+            <input id="annFntWt" type="text" ng-model="activeObject.insertion.annotation.font.wt"><br/>
+            <label for="annFntIt">Font Italic:</label>
+            <input id="annFntIt" type="text" ng-model="activeObject.insertion.annotation.font.italic"><br/>
+            <label for="annFntPos">Font Position:</label>
+            <input id="annFntPos" type="text" ng-model="activeObject.insertion.annotation.font.position"><br/>
+            <label for="annFntClr">Font Color:</label>
+            <input id="annFntClr" type="color" ng-model="activeObject.insertion.annotation.font.color"><br/>
+            <label for="annBgClr">Background Color:</label>
+            <input id="annBgClr" type="color" ng-model="activeObject.insertion.annotation.font.bgColor"><br/>
+
         </fieldset>
     </div>
-</div>
 </div>
