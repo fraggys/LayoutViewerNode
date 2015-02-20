@@ -1,20 +1,22 @@
 .parent{
-    width: 1066px; height:600px;border: 2px solid red;
+    height:600px;border: 2px solid red;
 }
 
 .source{
-    width: 200px; height: 200px; background: #eee;
+    width: 200px; height: 200px; background: #e9e9e9;
 }
 
-.header {
-    width: 1066px; background-color: #e9e9e9;
+.headerElem {
+    padding: .4em 1em .4em 1em;
+    margin-right: .7em;
 }
 
 .container {
+    width: 1066px;
 }
 
 .text{
     font-family: Verdana,Arial,sans-serif;
-    font-size: 1.1em;
+    font-size: 1.2em;
     font-weight: lighter;
 }

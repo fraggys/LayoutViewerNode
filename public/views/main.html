@@ -1,15 +1,14 @@
-<div class="header">
-    <label class="text">Barco</label>
+<div class="ui-widget-header ui-corner-all">
+    <label class="text headerElem">Barco</label>
     <select ng-model="layoutMaster"
-            ng-options="opt as opt.label for opt in options">
+            ng-options="opt as opt.label for opt in options" class="headerElem">
     </select>
-    <input type="text" ng-model="layoutMaster.label" ng-disabled="!layoutMaster.value"/>
+    <input type="text" ng-model="layoutMaster.label" ng-disabled="!layoutMaster.value" class="headerElem"/>
     <button id="saveBtn" ng-click="saveLayout()">Save</button>
 </div>
-        <div><br><br></div>
-<div>
+<div class=".ui-widget-content">
+    <br/><br/><br/>
     <button id="addBtn" ng-click="addSourceArea()" ng-disabled="!layoutMaster.value">Add Region</button>
-</div>
 <div class="parent">
     <source ng-repeat="(id,source) in layoutMaster.value" source-data="source"/>
 
@@ -23,17 +22,18 @@
     }'>
         <fieldset>
             <label for="posX">X:</label>
-            <input id="posX" type="text" ng-model="activeObject.insertion.posX">
+            <input id="posX" type="text" ng-model="activeObject.insertion.relX">
             <label for="posY">Y:</label>
-            <input id="posY" type="text" ng-model="activeObject.insertion.posY">
+            <input id="posY" type="text" ng-model="activeObject.insertion.relY">
             <label for="width">Width:</label>
-            <input id="width" type="text" ng-model="activeObject.insertion.width">
+            <input id="width" type="text" ng-model="activeObject.insertion.relW">
             <label for="height">Height:</label>
-            <input id="height" type="text" ng-model="activeObject.insertion.height">
+            <input id="height" type="text" ng-model="activeObject.insertion.relH">
             <label for="deviceId">Device ID:</label>
             <input id="deviceId" type="text" ng-model="activeObject.insertion.sourceRef.deviceId">
             <label for="channelId">Channel ID:</label>
             <input id="channelId" type="text" ng-model="activeObject.insertion.sourceRef.channelId">
         </fieldset>
     </div>
+</div>
 </div>

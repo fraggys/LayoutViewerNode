@@ -33,10 +33,10 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     //keep parentElemDimensions
     var parentElem = $(".parent")[0];
-    $scope.canvasX = (parentElem.offsetLeft) + 2;
-    $scope.canvasY = (parentElem.offsetTop) + 2;
     $scope.canvasW = (parentElem).offsetWidth;
     $scope.canvasH = (parentElem).offsetHeight;
+    $scope.canvasX = parentElem.offsetLeft + 2;
+    $scope.canvasY = parentElem.offsetTop + 2;
     $(".parent").contextmenu({
         delegate: ".source",
         menu: [
@@ -51,6 +51,9 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
     $scope.$watch('activeObject', function (newVal) {
         if (newVal) {
             var id = '#' + newVal.id;
+            //calculate element dimensions from relative values
+            newVal.insertion.posX = newVal.insertion.relX;
+            newVal.insertion.posY = newVal.insertion.relY
             $(id).offset({"top": newVal.insertion.posY, "left": newVal.insertion.posX})
                 .outerWidth(newVal.insertion.width)
                 .outerHeight(newVal.insertion.height);
@@ -66,8 +69,8 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 posY: "",
                 relX: "",
                 relY: "",
-                relW: "",
-                relH: "",
+                relW:"",
+                relH:"",
                 width: "",
                 height: "",
                 sourceRef: {
