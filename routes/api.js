@@ -65,4 +65,11 @@ router.post('/layout', function (req, res, next) {
     });
 });
 
+router.post('/upload', function (req, res) {
+    res.send("success");
+    //TODO call add source for adding source
+    console.log("response gone but work not done yet");
+});
+
+
 module.exports = router;
