@@ -52,8 +52,6 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         if (newVal) {
             var id = '#' + newVal.id;
             //calculate element dimensions from relative values
-            newVal.insertion.posX = newVal.insertion.relX;
-            newVal.insertion.posY = newVal.insertion.relY
             $(id).offset({"top": newVal.insertion.posY, "left": newVal.insertion.posX})
                 .outerWidth(newVal.insertion.width)
                 .outerHeight(newVal.insertion.height);
@@ -101,6 +99,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     function createSourceAreaFromLayoutData(insertionArr) {
         var retObj = {};
+        if(insertionArr){
         insertionArr.forEach(function (entry) {
             var srcAreaObj = {};
             srcAreaObj.id = generateUUId();
@@ -114,6 +113,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             srcAreaObj.insertion.sourceRef.channelId = entry.SourceRef[0].$.channelId;
             retObj[srcAreaObj.id] = srcAreaObj;
         });
+        }
         return retObj;
     }
 
@@ -168,6 +168,7 @@ layoutEditorApp.directive('source', function source() {
                 $scope.sourceData.insertion.height = e.target.offsetHeight;
             };
             $scope.openDialogWindow = function () {
+                console.dir($scope.sourceData);
                 $scope.$root.activeObject = $scope.sourceData;
                 $('#dialogWindow').dialog('open');
             };
