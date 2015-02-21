@@ -16,7 +16,7 @@
         "dialog": {
             "autoOpen": false,
             "height": 700,
-            "width": 500,
+            "width": 700,
             "modal": true,
             "resizable": false,
             "draggable": false
@@ -39,6 +39,11 @@
             <input id="deviceId" type="text" ng-model="activeObject.insertion.sourceRef.deviceId"><br/>
             <label for="channelId">Channel ID:</label>
             <input id="channelId" type="text" ng-model="activeObject.insertion.sourceRef.channelId"><br/>
+            <br/>
+            <h4>Upload Background File:</h4>
+            <hr>
+            <label for="bgImage">Background Image:</label>
+            <input id="bgImage" type="file" onchange="angular.element(this).scope().fileChangedHandler(this,'{{activeObject.id}}')"><br/>
             <br>
             <h4>Source Border Properties:</h4>
             <hr>

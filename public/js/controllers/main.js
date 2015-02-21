@@ -47,13 +47,12 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             {title: "Move to top", cmd: "copy", uiIcon: "ui-icon-arrowstop-1-n"},
             {title: "Move to bottom", cmd: "copy", uiIcon: "ui-icon-arrowstop-1-s"}
         ],
-        select: function(event, ui) {
+        select: function (event, ui) {
             alert("select " + ui.cmd + " on " + ui.target.text());
         },
-        preventContextMenuForPopup:true,
-        beforeOpen: function(event, ui) {
-            console.dir(event);
-    }
+        preventContextMenuForPopup: true,
+        beforeOpen: function (event, ui) {
+        }
     });
 
     /*Dialog window controls and logic refactor to move out at later time.*/
@@ -84,8 +83,9 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         var id = generateUUId();
         var srcArea = {
             id: id,
+            bgImage: "",
             insertion: {
-                type:"",
+                type: "",
                 posX: "",
                 posY: "",
                 width: "",
@@ -95,20 +95,20 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                     deviceId: "",
                     channelId: ""
                 },
-                border:{
-                    thickness:"",
-                    color:"",
-                    blinkSpeed:$scope.blinkSpeedOptions[0].value
+                border: {
+                    thickness: "",
+                    color: "",
+                    blinkSpeed: $scope.blinkSpeedOptions[0].value
                 },
-                annotation:{
-                    text:"",
-                    size:0,
+                annotation: {
+                    text: "",
+                    size: 0,
                     font: {
-                        wt:0,
-                        italic:false,
-                        position:"",
-                        color:"",
-                        bgColor:""
+                        wt: 0,
+                        italic: false,
+                        position: "",
+                        color: "",
+                        bgColor: ""
                     }
                 }
             }
@@ -117,6 +117,19 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
     };
 
     /*util functions for backend data mapping*/
+    $scope.$root.fileChangedHandler = function (element,id) {
+        var elem = "#"+id;
+        if (element.files && element.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $(elem).css({'background-image':'url('+e.target.result+')',
+                    'background-size': '100% 100%',
+                    'background-color': 'transparent',
+                    'background-repeat':'no-repeat'});
+            }
+            reader.readAsDataURL(element.files[0]);
+        }
+    }
 
     $scope.saveLayout = function () {
         createLayoutObjectFromSourceArea($scope.layoutMaster.label, $scope.layoutMaster.value);
@@ -128,20 +141,20 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     function createSourceAreaFromLayoutData(insertionArr) {
         var retObj = [];
-        if(insertionArr){
-        insertionArr.forEach(function (entry) {
-            var srcAreaObj = {};
-            srcAreaObj.id = generateUUId();
-            srcAreaObj.insertion = {};
-            srcAreaObj.insertion.posX = entry.$.x;
-            srcAreaObj.insertion.posY = entry.$.y;
-            srcAreaObj.insertion.height = entry.$.height;
-            srcAreaObj.insertion.width = entry.$.width;
-            srcAreaObj.insertion.sourceRef = {};
-            srcAreaObj.insertion.sourceRef.deviceId = entry.SourceRef[0].$.deviceId;
-            srcAreaObj.insertion.sourceRef.channelId = entry.SourceRef[0].$.channelId;
-            retObj.push(srcAreaObj);
-        });
+        if (insertionArr) {
+            insertionArr.forEach(function (entry) {
+                var srcAreaObj = {};
+                srcAreaObj.id = generateUUId();
+                srcAreaObj.insertion = {};
+                srcAreaObj.insertion.posX = entry.$.x;
+                srcAreaObj.insertion.posY = entry.$.y;
+                srcAreaObj.insertion.height = entry.$.height;
+                srcAreaObj.insertion.width = entry.$.width;
+                srcAreaObj.insertion.sourceRef = {};
+                srcAreaObj.insertion.sourceRef.deviceId = entry.SourceRef[0].$.deviceId;
+                srcAreaObj.insertion.sourceRef.channelId = entry.SourceRef[0].$.channelId;
+                retObj.push(srcAreaObj);
+            });
         }
         return retObj;
     }
@@ -152,18 +165,18 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             "Insertion": []
         };
         if (layoutData) {
-            layoutData.forEach(function(entry) {
-                console.log($scope.canvasH)
+            layoutData.forEach(function (entry) {
                 var insert = entry.insertion;
                 layout.Insertion.push({
                     "x": (insert.posX - $scope.canvasX) / $scope.canvasW,
-                    "y": ($scope.canvasY+$scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
+                    "y": ($scope.canvasY + $scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
                     "width": (insert.width / $scope.canvasW),
                     "height": (insert.height / $scope.canvasH),
                     "sourceRef": insert.sourceRef
                 });
             });
         }
+
         $http.post('/api/layout', layout)
             .success(function (data, status, headers, config) {
                 console.log("success while posting layout data");
@@ -173,7 +186,6 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             });
 
     }
-
 });
 
 layoutEditorApp.directive('source', function source() {
@@ -186,7 +198,6 @@ layoutEditorApp.directive('source', function source() {
             sourceData: '='
         },
         link: function (scope, elem, attr) {
-            console.dir(scope);
             scope.sourceData.insertion.posX = elem[0].offsetLeft;
             scope.sourceData.insertion.posY = elem[0].offsetTop;
             scope.sourceData.insertion.width = elem[0].offsetWidth;
@@ -200,7 +211,6 @@ layoutEditorApp.directive('source', function source() {
                 $scope.sourceData.insertion.height = e.target.offsetHeight;
             };
             $scope.openDialogWindow = function () {
-                console.dir($scope.sourceData);
                 $scope.$root.activeObject = $scope.sourceData;
                 $('#dialogWindow').dialog('open');
             };
