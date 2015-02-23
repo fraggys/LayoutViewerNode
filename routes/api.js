@@ -46,7 +46,7 @@ router.post('/layout', function (req, res, next) {
             if(bkgFileName){
                 //add source to cng and create SourceRef for this Insertion.
                 var srcDetArr =  insert.bgImgName.split("_");
-                cngClient.client.addSource("localMedia",insert.bgImgName,srcDetArr[0],srcDetArr[1],bkgFileLocalPath,"true","","false", function(result){
+                cngClient.client.addSource("localImage",insert.bgImgName,srcDetArr[0],srcDetArr[1],bkgFileLocalPath,"true","","false", function(result){
                     console.log(result);
                 });
             }
