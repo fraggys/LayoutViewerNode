@@ -43,7 +43,7 @@
             <h4>Upload Background File:</h4>
             <hr>
             <label for="bgImage">Background Image:</label>
-            <input id="bgImage" type="file" onchange="angular.element(this).scope().fileChangedHandler(this,'{{activeObject.id}}')"><br/>
+            <input id="bgImage" type="file" accept="image/*" file-reader><br/>
             <br>
             <h4>Source Border Properties:</h4>
             <hr>

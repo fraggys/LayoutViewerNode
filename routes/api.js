@@ -28,13 +28,7 @@ router.get('/layouts', function (req, res, next) {
 /* POST API listing */
 
 router.post('/layout', function (req, res, next) {
-    /*layout = {$: { "title":"Two sources" }, "Insertion":[ {
-     $: { "x": 0.0, "y": 0.0, "width": 0.5, "height": 1.0 },
-     "SourceRef": { $:{"deviceId":6003,"channelId":0 }}
-     }]} */
-    console.log("getting post request");
-    //console.dir(req.body);
-    var data = req.body;
+    var data = JSON.parse(req.body.layout);
     var layout = {
         "$": {
             "title": data.title
@@ -44,6 +38,20 @@ router.post('/layout', function (req, res, next) {
     if (data.Insertion) {
         for (var i = 0; i < data.Insertion.length; i += 1) {
             var insert = data.Insertion[i];
+            //wait we need to add sources in CNG with actual dir path and append sourceref in layout before saving layout to
+            //cng....get file handle from "bgImageFileName"
+            var bkgFileName = insert.bgImgName+insert.bgImgExt;
+            var bkgFileLocalPath = process.cwd()+"\\"+ "public\\uploads\\"+bkgFileName;
+            var bkgFileURL= req.protocol+"://"+req.get('host')+"/images/"+bkgFileName;
+            if(bkgFileName){
+                //add source to cng and create SourceRef for this Insertion.
+                var srcDetArr =  insert.bgImgName.split("_");
+                cngClient.client.addSource("localMedia",insert.bgImgName,srcDetArr[0],srcDetArr[1],bkgFileLocalPath,"true","","false", function(result){
+                    console.log(result);
+                });
+            }
+            //add bkgImage into the layout Area as sourceRef
+
             layout.Insertion.push({
                 "$": {
                     "x": insert.x,
@@ -59,16 +67,22 @@ router.post('/layout', function (req, res, next) {
                 }
             });
         }
-    }
-    cngClient.client.addLayout(layout, function (result) {
+        /*cngClient.client.addLayout(layout, function (result) {
+         res.send("success");
+         });*/
         res.send("success");
-    });
+    } else {
+        res.send("invalid data");
+    }
+
+
 });
 
 router.post('/upload', function (req, res) {
+    //Upload file to server.
+    // Currently not using but if used 'filename' will be renamed to form field name
+    //see app.js line #27
     res.send("success");
-    //TODO call add source for adding source
-    console.log("response gone but work not done yet");
 });
 
 

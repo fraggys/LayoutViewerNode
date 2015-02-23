@@ -83,7 +83,6 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         var id = generateUUId();
         var srcArea = {
             id: id,
-            bgImage: "",
             insertion: {
                 type: "",
                 posX: "",
@@ -116,23 +115,8 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         $scope.layoutMaster.value.push(srcArea);
     };
 
-    /*util functions for backend data mapping*/
-    $scope.$root.fileChangedHandler = function (element,id) {
-        var elem = "#"+id;
-        if (element.files && element.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $(elem).css({'background-image':'url('+e.target.result+')',
-                    'background-size': '100% 100%',
-                    'background-color': 'transparent',
-                    'background-repeat':'no-repeat'});
-            }
-            reader.readAsDataURL(element.files[0]);
-        }
-    }
-
     $scope.saveLayout = function () {
-        createLayoutObjectFromSourceArea($scope.layoutMaster.label, $scope.layoutMaster.value);
+        postLayoutDataAsForm($scope.layoutMaster.label, $scope.layoutMaster.value);
     };
 
     function generateUUId() {
@@ -159,32 +143,40 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         return retObj;
     }
 
-    function createLayoutObjectFromSourceArea(layoutName, layoutData) {
+    function postLayoutDataAsForm(layoutName, layoutData) {
+        var formData = new FormData();
+
         var layout = {
             "title": layoutName,
             "Insertion": []
         };
         if (layoutData) {
-            layoutData.forEach(function (entry) {
-                var insert = entry.insertion;
-                layout.Insertion.push({
+            for (var i = 0; i < layoutData.length; i += 1) {
+                var insert = layoutData[i].insertion;
+                var insertVO = {
                     "x": (insert.posX - $scope.canvasX) / $scope.canvasW,
                     "y": ($scope.canvasY + $scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
                     "width": (insert.width / $scope.canvasW),
                     "height": (insert.height / $scope.canvasH),
                     "sourceRef": insert.sourceRef
-                });
-            });
+                };
+                var file = layoutData[i].bgImageFile;
+                if (file) {
+                    // layoutName as deviceId and UUID of src Area as channelId
+                    var fieldName = layoutName + "_" + layoutData[i].id;
+                    var fileName = file.name;
+                    formData.append(fieldName, file, fileName);
+                    insertVO["bgImgName"] = fieldName;
+                    insertVO["bgImgExt"] = fileName.substring(fileName.lastIndexOf("."));
+                }
+                layout.Insertion.push(insertVO);
+            }
         }
-
-        $http.post('/api/layout', layout)
-            .success(function (data, status, headers, config) {
-                console.log("success while posting layout data");
-            })
-            .error(function (data, status, headers, config) {
-                console.log("whoa server blew up");
-            });
-
+        formData.append("layout", JSON.stringify(layout));
+        /* uploading blob is not supported in angular switching to AJAX */
+        var request = new XMLHttpRequest();
+        request.open("POST", "/api/layout");
+        request.send(formData);
     }
 });
 
@@ -216,4 +208,28 @@ layoutEditorApp.directive('source', function source() {
             };
         }
     };
+});
+
+layoutEditorApp.directive("fileReader", function () {
+    return {
+        restrict: "A",
+        link: function ($scope, el) {
+            el.bind("change", function (e) {
+                if ((e.srcElement || e.target).files[0]) {
+                    var elemId = "#" + $scope.activeObject.id;
+                    $scope.activeObject.bgImageFile = (e.srcElement || e.target).files[0];
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $(elemId).css({
+                            'background-image': 'url(' + URL.createObjectURL($scope.activeObject.bgImageFile) + ')',
+                            'background-size': '100% 100%',
+                            'background-color': 'transparent',
+                            'background-repeat': 'no-repeat'
+                        });
+                    }
+                    reader.readAsDataURL($scope.activeObject.bgImageFile);
+                }
+            });
+        }
+    }
 });
