@@ -1,9 +1,15 @@
-.parent{
-    height:600px;border: 2px solid red;
+.parent {
+    height: 600px;
+    border: 2px solid red;
+    position: relative;
 }
 
-.source{
-    width: 200px; height: 200px; background-color: #808080;
+.source {
+    width: 200px;
+    height: 200px;
+    background-color: #808080;
+    position: absolute !important;
+    z-index: 99
 }
 
 .headerElem {
@@ -13,10 +19,15 @@
 
 .container {
     width: 1066px;
+    margin:auto;
 }
 
-.text{
-    font-family: Verdana,Arial,sans-serif;
+.text {
+    font-family: Verdana, Arial, sans-serif;
     font-size: 1.2em;
     font-weight: lighter;
+}
+
+.top {
+    z-index: 100;
 }

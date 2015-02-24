@@ -4,7 +4,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     $scope.options = [
         {label: 'Change Layout', text: '', value: ''},
-        {label: 'Create New Layout', text: 'New Layout', value: []}
+        {label: 'Create New Layout', text: 'New Layout', value: {}}
     ];
 
     //get layout list from server
@@ -53,7 +53,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         select: function (event, ui) {
             alert("select " + ui.cmd + " on " + ui.target.text());
         },
-        preventContextMenuForPopup: true,
+        addClass: "top",
         beforeOpen: function (event, ui) {
         }
     });
@@ -69,16 +69,19 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         {label: 'Slow', value: 'slow'},
         {label: 'Medium', value: 'medium'},
         {label: 'Fast', value: 'fast'},
-        {label: 'Very Fast', value: 'veryFast'},
+        {label: 'Very Fast', value: 'veryFast'}
     ];
 
-    $scope.$watch('activeObject', function (newVal) {
+    $scope.$watch('layoutMaster.value[currentId]', function (newVal) {
         if (newVal) {
             var id = '#' + newVal.id;
             //calculate element dimensions from relative values
-            $(id).offset({"top": newVal.insertion.posY, "left": newVal.insertion.posX})
-                .outerWidth(newVal.insertion.width)
-                .outerHeight(newVal.insertion.height);
+            $(id).css({
+                top: newVal.insertion.posY + "px",
+                left: newVal.insertion.posX + "px",
+                width: newVal.insertion.width,
+                height: newVal.insertion.height
+            });
         }
     }, true);
 
@@ -115,7 +118,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 }
             }
         };
-        $scope.layoutMaster.value.push(srcArea);
+        $scope.layoutMaster.value[id] = (srcArea);
     };
 
     $scope.saveLayout = function () {
@@ -127,7 +130,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
     }
 
     function createSourceAreaFromLayoutData(insertionArr) {
-        var retObj = [];
+        var retObj = {};
         if (insertionArr) {
             insertionArr.forEach(function (entry) {
                 var srcAreaObj = {};
@@ -140,7 +143,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 srcAreaObj.insertion.sourceRef = {};
                 srcAreaObj.insertion.sourceRef.deviceId = entry.SourceRef[0].$.deviceId;
                 srcAreaObj.insertion.sourceRef.channelId = entry.SourceRef[0].$.channelId;
-                retObj.push(srcAreaObj);
+                retObj[srcAreaObj.id] = (srcAreaObj);
             });
         }
         return retObj;
@@ -176,7 +179,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             }
         }
         formData.append("layout", JSON.stringify(layout));
-        /* uploading blob is not supported in angular switching to AJAX */
+        /* uploading blob is not supported in $http switching to AJAX only chrome pls */
         var request = new XMLHttpRequest();
         request.open("POST", "/api/layout");
         request.send(formData);
@@ -206,7 +209,7 @@ layoutEditorApp.directive('source', function source() {
                 $scope.sourceData.insertion.height = e.target.offsetHeight;
             };
             $scope.openDialogWindow = function () {
-                $scope.$root.activeObject = $scope.sourceData;
+                $scope.$root.currentId = $scope.sourceData.id;
                 $('#dialogWindow').dialog('open');
             };
         }
@@ -219,18 +222,14 @@ layoutEditorApp.directive("fileReader", function () {
         link: function ($scope, el) {
             el.bind("change", function (e) {
                 if ((e.srcElement || e.target).files[0]) {
-                    var elemId = "#" + $scope.activeObject.id;
-                    $scope.activeObject.bgImageFile = (e.srcElement || e.target).files[0];
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        $(elemId).css({
-                            'background-image': 'url(' + URL.createObjectURL($scope.activeObject.bgImageFile) + ')',
-                            'background-size': '100% 100%',
-                            'background-color': 'transparent',
-                            'background-repeat': 'no-repeat'
-                        });
-                    }
-                    reader.readAsDataURL($scope.activeObject.bgImageFile);
+                    var elemId = "#" + $scope.currentId;
+                    $scope.layoutMaster.value[$scope.currentId].bgImageFile = (e.srcElement || e.target).files[0];
+                    $(elemId).css({
+                        'background-image': 'url(' + URL.createObjectURL($scope.layoutMaster.value[$scope.currentId].bgImageFile) + ')',
+                        'background-size': '100% 100%',
+                        'background-color': 'transparent',
+                        'background-repeat': 'no-repeat'
+                    });
                 }
             });
         }
