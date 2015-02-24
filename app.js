@@ -25,7 +25,7 @@ app.use(multer(
     {
         dest: './public/uploads/',
         rename: function (fieldname, filename) {
-           return fieldname;
+           return fieldname.replace('/ /g', ""); //CNG complains for space in source name.
         }
     }
 ))

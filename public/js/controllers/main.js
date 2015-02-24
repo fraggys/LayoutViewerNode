@@ -3,20 +3,22 @@
 layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     $scope.options = [
-        {label: 'Change Layout', text:'', value: ''},
-        {label: 'Create New Layout',text:'New Layout', value: []}
+        {label: 'Change Layout', text: '', value: ''},
+        {label: 'Create New Layout', text: 'New Layout', value: []}
     ];
 
     //get layout list from server
     $http.get('/api/layouts')
         .success(function (data, status, headers, config) {
-            data.forEach(function (layout) {
-                $scope.options.push({
-                    label: layout.$.title,
-                    text: layout.$.title,
-                    value: createSourceAreaFromLayoutData(layout.Insertion)
+            if (data) {
+                data.forEach(function (layout) {
+                    $scope.options.push({
+                        label: layout.$.title,
+                        text: layout.$.title,
+                        value: createSourceAreaFromLayoutData(layout.Insertion)
+                    });
                 });
-            });
+            }
         })
         .error(function (data, status, headers, config) {
             //TODO handle error
