@@ -46,17 +46,22 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     $(".parent").contextmenu({
         delegate: ".source",
+        addClass: "top",
+        preventContextMenuForPopup: true,
         menu: [
-            {title: "Move to top", cmd: "copy", uiIcon: "ui-icon-arrowstop-1-n"},
-            {title: "Move to bottom", cmd: "copy", uiIcon: "ui-icon-arrowstop-1-s"}
+            {title: "Move to top", cmd: "top", uiIcon: "ui-icon-arrowstop-1-n"},
+            {title: "Move to bottom", cmd: "bottom", uiIcon: "ui-icon-arrowstop-1-s"},
+            {title: "Move higher", cmd: "up", uiIcon: "ui-icon-arrow-1-n"},
+            {title: "Move lower", cmd: "down", uiIcon: "ui-icon-arrow-1-s"},
+            {title: "Delete", cmd: "delete", uiIcon: "ui-icon-close"}
         ],
         select: function (event, ui) {
-            alert("select " + ui.cmd + " on " + ui.target.text());
-        },
-        addClass: "top",
-        beforeOpen: function (event, ui) {
+            alert(ui.target.text());
+            if(ui.cmd==="delete"){
+                //delete the src area
+            }
         }
-    });
+    })
 
     /*Dialog window controls and logic refactor to move out at later time.*/
     $scope.srcTypeOptions = [
@@ -157,8 +162,9 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             "Insertion": []
         };
         if (layoutData) {
-            for (var i = 0; i < layoutData.length; i += 1) {
-                var insert = layoutData[i].insertion;
+            angular.forEach(layoutData, function (srcArea)
+             {
+                var insert = srcArea.insertion;
                 var insertVO = {
                     "x": (insert.posX - $scope.canvasX) / $scope.canvasW,
                     "y": ($scope.canvasY + $scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
@@ -166,17 +172,17 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                     "height": (insert.height / $scope.canvasH),
                     "sourceRef": insert.sourceRef
                 };
-                var file = layoutData[i].bgImageFile;
+                var file = srcArea.bgImageFile;
                 if (file) {
                     // layoutName as deviceId and UUID of src Area as channelId
-                    var fieldName = layoutName + "_" + layoutData[i].id;
+                    var fieldName = layoutName + "_" + srcArea.id;
                     var fileName = file.name;
                     formData.append(fieldName, file, fileName);
                     insertVO["bgImgName"] = fieldName;
                     insertVO["bgImgExt"] = fileName.substring(fileName.lastIndexOf("."));
                 }
                 layout.Insertion.push(insertVO);
-            }
+            });
         }
         formData.append("layout", JSON.stringify(layout));
         /* uploading blob is not supported in $http switching to AJAX only chrome pls */
