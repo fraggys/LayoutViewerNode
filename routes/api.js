@@ -40,18 +40,21 @@ router.post('/layout', function (req, res, next) {
             var insert = data.Insertion[i];
             //wait we need to add sources in CNG with actual dir path and append sourceref in layout before saving layout to
             //cng....get file handle from "bgImageFileName"
-            var bkgFileName = insert.bgImgName+insert.bgImgExt;
-            var bkgFileLocalPath = process.cwd()+"\\"+ "public\\uploads\\"+bkgFileName;
-            var bkgFileURL= req.protocol+"://"+req.get('host')+"/images/"+bkgFileName;
-            if(bkgFileName){
+            var bkgFileName = insert.bgImgName + insert.bgImgExt;
+            var deviceId, channelId;
+            if (bkgFileName) {
+                var bkgFileLocalPath = process.cwd() + "\\" + "public\\uploads\\" + bkgFileName;
+                var bkgFileURL = req.protocol + "://" + req.get('host') + "/images/" + bkgFileName;
                 //add source to cng and create SourceRef for this Insertion.
-                var srcDetArr =  insert.bgImgName.split("_");
-                cngClient.client.addSource("localImage",insert.bgImgName,srcDetArr[0],srcDetArr[1],bkgFileLocalPath,"true","","false", function(result){
+                var srcDetArr = insert.bgImgName.split("_");
+                cngClient.client.addSource("localImage", insert.bgImgName, srcDetArr[0], srcDetArr[1], bkgFileLocalPath, "true", "", "false", function (result) {
                     console.log(result);
                 });
+                deviceId = insert.sourceRef.deviceId || srcDetArr[0];
+                channelId = insert.sourceRef.channelId || srcDetArr[1];
             }
-            //add bkgImage into the layout Area as sourceRef
-
+            //user will either upload bgImage or give deviceId and channelId for bg
+            //if deviceId and channelId both are present override uploaded image with text fields.
             layout.Insertion.push({
                 "$": {
                     "x": insert.x,
@@ -61,21 +64,18 @@ router.post('/layout', function (req, res, next) {
                 },
                 "SourceRef": {
                     "$": {
-                        "deviceId": insert.sourceRef.deviceId,
-                        "channelId": insert.sourceRef.channelId
+                        "deviceId": deviceId,
+                        "channelId": channelId
                     }
                 }
             });
         }
-        /*cngClient.client.addLayout(layout, function (result) {
-         res.send("success");
-         });*/
-        res.send("success");
+        cngClient.client.addLayout(layout, function (result) {
+            res.send("success");
+        });
     } else {
         res.send("invalid data");
     }
-
-
 });
 
 router.post('/upload', function (req, res) {

@@ -3,7 +3,7 @@
     <select ng-model="layoutMaster"
             ng-options="opt as opt.label for opt in options" class="headerElem">
     </select>
-    <input type="text" ng-model="layoutMaster.label" ng-disabled="!layoutMaster.value" class="headerElem"/>
+    <input type="text" ng-model="layoutMaster.text" ng-disabled="!layoutMaster.value" class="headerElem"/>
     <button id="saveBtn" ng-click="saveLayout()">Save</button>
 </div>
 <div class=".ui-widget-content">

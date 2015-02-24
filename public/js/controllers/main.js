@@ -3,8 +3,8 @@
 layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     $scope.options = [
-        {label: 'Change Layout', value: ''},
-        {label: 'Create New Layout', value: []}
+        {label: 'Change Layout', text:'', value: ''},
+        {label: 'Create New Layout',text:'New Layout', value: []}
     ];
 
     //get layout list from server
@@ -13,6 +13,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             data.forEach(function (layout) {
                 $scope.options.push({
                     label: layout.$.title,
+                    text: layout.$.title,
                     value: createSourceAreaFromLayoutData(layout.Insertion)
                 });
             });
@@ -116,7 +117,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
     };
 
     $scope.saveLayout = function () {
-        postLayoutDataAsForm($scope.layoutMaster.label, $scope.layoutMaster.value);
+        postLayoutDataAsForm($scope.layoutMaster.text, $scope.layoutMaster.value);
     };
 
     function generateUUId() {
