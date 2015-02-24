@@ -7,6 +7,9 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         {label: 'Create New Layout', text: 'New Layout', value: {}}
     ];
 
+    //init select-menu.
+    $scope.layoutMaster = $scope.options[0];
+
     //get layout list from server
     $http.get('/api/layouts')
         .success(function (data, status, headers, config) {
@@ -15,7 +18,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                     $scope.options.push({
                         label: layout.$.title,
                         text: layout.$.title,
-                        value: createSourceAreaFromLayoutData(layout.Insertion)
+                        value: loadLayout(layout.Insertion)
                     });
                 });
             }
@@ -23,8 +26,6 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         .error(function (data, status, headers, config) {
             //TODO handle error
         });
-    //init select-menu.
-    $scope.layoutMaster = $scope.options[0];
 
     $("#addBtn").button({
         icons: {
@@ -41,8 +42,6 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
     var parentElem = $(".parent")[0];
     $scope.canvasW = (parentElem).offsetWidth;
     $scope.canvasH = (parentElem).offsetHeight;
-    $scope.canvasX = parentElem.offsetLeft + 2;
-    $scope.canvasY = parentElem.offsetTop + 2;
 
     $(".parent").contextmenu({
         delegate: ".source",
@@ -57,13 +56,21 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         ],
         select: function (event, ui) {
             alert(ui.target.text());
-            if(ui.cmd==="delete"){
+            if (ui.cmd === "delete") {
                 //delete the src area
+            } else if(ui.cmd === "up"){
+                console.dir(ui);
+
+            } else if(ui.cmd === "down"){
+
+            } else if(ui.cmd === "top"){
+
+            } else if(ui.cmd === "bottom"){
+
             }
         }
-    })
+    });
 
-    /*Dialog window controls and logic refactor to move out at later time.*/
     $scope.srcTypeOptions = [
         {label: 'Insertion', value: 'Insertion'},
         {label: 'Region', value: 'Region'}
@@ -77,6 +84,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         {label: 'Very Fast', value: 'veryFast'}
     ];
 
+    //when user changes the value from dialog this will update the css of src area
     $scope.$watch('layoutMaster.value[currentId]', function (newVal) {
         if (newVal) {
             var id = '#' + newVal.id;
@@ -90,6 +98,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         }
     }, true);
 
+    //add new source Area to model
     $scope.addSourceArea = function () {
         var id = generateUUId();
         var srcArea = {
@@ -126,15 +135,8 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         $scope.layoutMaster.value[id] = (srcArea);
     };
 
-    $scope.saveLayout = function () {
-        postLayoutDataAsForm($scope.layoutMaster.text, $scope.layoutMaster.value);
-    };
-
-    function generateUUId() {
-        return new Date().getTime();
-    }
-
-    function createSourceAreaFromLayoutData(insertionArr) {
+    //process custom layout data received from server to populate in select menu
+    function loadLayout(insertionArr) {
         var retObj = {};
         if (insertionArr) {
             insertionArr.forEach(function (entry) {
@@ -154,28 +156,29 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         return retObj;
     }
 
-    function postLayoutDataAsForm(layoutName, layoutData) {
-        var formData = new FormData();
-
-        var layout = {
-            "title": layoutName,
-            "Insertion": []
-        };
+    //send model data for layout to server for adding layout
+    $scope.saveLayout = function () {
+        var layoutName = $scope.layoutMaster.text;
+        var layoutData = $scope.layoutMaster.value;
         if (layoutData) {
-            angular.forEach(layoutData, function (srcArea)
-             {
-                var insert = srcArea.insertion;
+            var formData = new FormData();
+            var layout = {
+                "title": layoutName,
+                "Insertion": []
+            };
+            angular.forEach(layoutData, function (value) {
+                var insert = value.insertion;
                 var insertVO = {
-                    "x": (insert.posX - $scope.canvasX) / $scope.canvasW,
-                    "y": ($scope.canvasY + $scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
+                    "x": (insert.posX) / $scope.canvasW,
+                    "y": ($scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
                     "width": (insert.width / $scope.canvasW),
                     "height": (insert.height / $scope.canvasH),
                     "sourceRef": insert.sourceRef
                 };
-                var file = srcArea.bgImageFile;
+                var file = value.bgImageFile;
                 if (file) {
                     // layoutName as deviceId and UUID of src Area as channelId
-                    var fieldName = layoutName + "_" + srcArea.id;
+                    var fieldName = layoutName + "_" + value.id;
                     var fileName = file.name;
                     formData.append(fieldName, file, fileName);
                     insertVO["bgImgName"] = fieldName;
@@ -183,13 +186,21 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 }
                 layout.Insertion.push(insertVO);
             });
+
+            formData.append("layout", JSON.stringify(layout));
+            console.dir(layout);
+            /*looks like uploading blob is not supported in $http switching to AJAX only chrome pls */
+           /* var request = new XMLHttpRequest();
+            request.open("POST", "/api/layout");
+            request.send(formData);*/
         }
-        formData.append("layout", JSON.stringify(layout));
-        /* uploading blob is not supported in $http switching to AJAX only chrome pls */
-        var request = new XMLHttpRequest();
-        request.open("POST", "/api/layout");
-        request.send(formData);
+    };
+
+    //generate UUID will be used as channelId in file uploaded.
+    function generateUUId() {
+        return new Date().getTime();
     }
+
 });
 
 layoutEditorApp.directive('source', function source() {
