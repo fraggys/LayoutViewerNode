@@ -55,18 +55,28 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             {title: "Delete", cmd: "delete", uiIcon: "ui-icon-close"}
         ],
         select: function (event, ui) {
-            alert(ui.target.text());
             if (ui.cmd === "delete") {
-                //delete the src area
-            } else if(ui.cmd === "up"){
-                console.dir(ui);
-
-            } else if(ui.cmd === "down"){
-
-            } else if(ui.cmd === "top"){
-
-            } else if(ui.cmd === "bottom"){
-
+                //delete the src area for this we need to move this logic in angular
+            } else if (ui.cmd === "up") {
+                ui.target.zIndex(ui.target.zIndex() + 1);
+            } else if (ui.cmd === "down") {
+                ui.target.zIndex(ui.target.zIndex() - 1);
+            } else if (ui.cmd === "top") {
+                var zIndiciesT = ui.target.siblings(".source").map(function () {
+                        return +$(ui.target).css("z-index");
+                    }).get();
+                var zIndexMax = Math.max.apply(null, zIndiciesT);
+                if (zIndexMax >= +ui.target.css("z-index")) {
+                    ui.target.css("z-index", zIndexMax + 1);
+                }
+            } else if (ui.cmd === "bottom") {
+                var zIndicies = ui.target.siblings(".source").map(function () {
+                        return +$(ui.target).css("z-index");
+                    }).get();
+                var zIndexMin = Math.min.apply(null, zIndicies);
+                if (zIndexMin <= +ui.target.css("z-index")) {
+                    ui.target.css("z-index", zIndexMin - 1);
+                }
             }
         }
     });
@@ -190,9 +200,9 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             formData.append("layout", JSON.stringify(layout));
             console.dir(layout);
             /*looks like uploading blob is not supported in $http switching to AJAX only chrome pls */
-           /* var request = new XMLHttpRequest();
-            request.open("POST", "/api/layout");
-            request.send(formData);*/
+            /* var request = new XMLHttpRequest();
+             request.open("POST", "/api/layout");
+             request.send(formData);*/
         }
     };
 

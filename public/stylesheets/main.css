@@ -9,7 +9,7 @@
     height: 200px;
     background-color: #808080;
     position: absolute !important;
-    z-index: 99
+    z-index: 50
 }
 
 .headerElem {
