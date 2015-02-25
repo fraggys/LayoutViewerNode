@@ -93,6 +93,14 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         {label: 'Fast', value: 'fast'},
         {label: 'Very Fast', value: 'veryFast'}
     ];
+    $scope.fontPosOptions = [
+        {label: 'Top Left', value: 'topLeft'},
+        {label: 'Top Center', value: 'topCenter'},
+        {label: 'Top Right', value: 'topRight'},
+        {label: 'Bottom Left', value: 'bottomLeft'},
+        {label: 'Bottom Center', value: 'bottomCenter'},
+        {label: 'Bottom Right', value: 'bottomRight'},
+    ];
 
     //when user changes the value from dialog this will update the css of src area
     $scope.$watch('layoutMaster.value[currentId]', function (newVal) {
@@ -127,7 +135,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 border: {
                     thickness: "",
                     color: "",
-                    blinkSpeed: $scope.blinkSpeedOptions[0].value
+                    blinkSpeed: $scope.blinkSpeedOptions[0]
                 },
                 annotation: {
                     text: "",
@@ -135,7 +143,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                     font: {
                         wt: 0,
                         italic: false,
-                        position: "",
+                        position:  $scope.fontPosOptions[4],
                         color: "",
                         bgColor: ""
                     }

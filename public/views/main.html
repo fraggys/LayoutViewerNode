@@ -19,12 +19,12 @@
             "width": 700,
             "modal": true,
             "resizable": false,
-            "draggable": false
+            "draggable": true
         }
     }'>
         <fieldset>
             <label for="srcType">Source Type: </label>
-            <select id="srcType" ng-model="activeObject.insertion.type"
+            <select id="srcType" ng-model="layoutMaster.value[currentId].insertion.type"
                     ng-options="opt as opt.label for opt in srcTypeOptions">
             </select><br/>
             <label for="posX">X:</label>
@@ -35,7 +35,6 @@
             <input id="width" type="text" ng-model="layoutMaster.value[currentId].insertion.width"><br/>
             <label for="height">Height:</label>
             <input id="height" type="text" ng-model="layoutMaster.value[currentId].insertion.height"><br/>
-
             <h4>Background Image:</h4>
             <hr>
             <h5>Existing Source Info: </h5>
@@ -69,7 +68,9 @@
             <label for="annFntIt">Font Italic:</label>
             <input id="annFntIt" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.font.italic"><br/>
             <label for="annFntPos">Font Position:</label>
-            <input id="annFntPos" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.font.position"><br/>
+            <select id="annFntPos" ng-model="layoutMaster.value[currentId].insertion.annotation.font.position"
+                    ng-options="opt as opt.label for opt in fontPosOptions">
+            </select><br/>
             <label for="annFntClr">Font Color:</label>
             <input id="annFntClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.font.color"><br/>
             <label for="annBgClr">Background Color:</label>
