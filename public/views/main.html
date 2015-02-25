@@ -25,7 +25,7 @@
         <fieldset>
             <label for="srcType">Source Type: </label>
             <select id="srcType" ng-model="layoutMaster.value[currentId].insertion.type"
-                    ng-options="opt as opt.label for opt in srcTypeOptions">
+                    ng-options="opt.value as opt.label for opt in srcTypeOptions">
             </select><br/>
             <label for="posX">X:</label>
             <input id="posX" type="text" ng-model="layoutMaster.value[currentId].insertion.posX"><br/>
@@ -45,7 +45,6 @@
             <h5>OR: </h5>
             <label for="bgImage">Choose Image File:</label>
             <input id="bgImage" type="file" accept="image/*" file-reader><br/>
-            <br>
             <h4>Source Border Properties:</h4>
             <hr>
             <label for="borderWt">Border Thickness</label>
@@ -54,9 +53,8 @@
             <input id="borderClr" type="color" ng-model="layoutMaster.value[currentId].insertion.border.color"><br>
             <label for="borderBlink">Border Blink Speed:</label>
             <select id="borderBlink" ng-model="layoutMaster.value[currentId].insertion.border.blinkSpeed"
-                    ng-options="opt as opt.label for opt in blinkSpeedOptions">
+                    ng-options="opt.value as opt.label for opt in blinkSpeedOptions">
             </select><br/>
-            <br>
             <h4>Source Annotation Properties:</h4>
             <hr>
             <label for="annText">Text:</label>
@@ -64,17 +62,29 @@
             <label for="annSize">Size:</label>
             <input id="annSize" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.size"><br/>
             <label for="annFntWt">Font Weight:</label>
-            <input id="annFntWt" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.font.wt"><br/>
+            <select id="annFntWt" ng-model="layoutMaster.value[currentId].insertion.annotation.font.wt"
+                    ng-options="opt.value as opt.label for opt in fontWtOptions">
+            </select><br/>
             <label for="annFntIt">Font Italic:</label>
             <input id="annFntIt" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.font.italic"><br/>
             <label for="annFntPos">Font Position:</label>
             <select id="annFntPos" ng-model="layoutMaster.value[currentId].insertion.annotation.font.position"
-                    ng-options="opt as opt.label for opt in fontPosOptions">
+                    ng-options="opt.value as opt.label for opt in fontPosOptions">
             </select><br/>
             <label for="annFntClr">Font Color:</label>
             <input id="annFntClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.font.color"><br/>
             <label for="annBgClr">Background Color:</label>
             <input id="annBgClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.font.bgColor"><br/>
+            <h4>Region Settings:</h4>
+            <hr>
+            <label for="signalType">Text:</label>
+            <input id="signalType" type="text" ng-model="layoutMaster.value[currentId].insertion.region.signalType"><br/>
+            <label for="extraTag">Size:</label>
+            <input id="extraTag" type="text" ng-model="layoutMaster.value[currentId].insertion.region.extraTag"><br/>
+            <label for="layoutType">Layout Type:</label>
+            <select id="layoutType" ng-model="layoutMaster.value[currentId].insertion.region.layoutType"
+                    ng-options="opt.value as opt.label for opt in layoutTypeOptions">
+            </select><br/>
         </fieldset>
     </div>
 </div>

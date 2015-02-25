@@ -63,16 +63,16 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 ui.target.zIndex(ui.target.zIndex() - 1);
             } else if (ui.cmd === "top") {
                 var zIndiciesT = ui.target.siblings(".source").map(function () {
-                        return +$(ui.target).css("z-index");
-                    }).get();
+                    return +$(ui.target).css("z-index");
+                }).get();
                 var zIndexMax = Math.max.apply(null, zIndiciesT);
                 if (zIndexMax >= +ui.target.css("z-index")) {
                     ui.target.css("z-index", zIndexMax + 1);
                 }
             } else if (ui.cmd === "bottom") {
                 var zIndicies = ui.target.siblings(".source").map(function () {
-                        return +$(ui.target).css("z-index");
-                    }).get();
+                    return +$(ui.target).css("z-index");
+                }).get();
                 var zIndexMin = Math.min.apply(null, zIndicies);
                 if (zIndexMin <= +ui.target.css("z-index")) {
                     ui.target.css("z-index", zIndexMin - 1);
@@ -99,7 +99,19 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         {label: 'Top Right', value: 'topRight'},
         {label: 'Bottom Left', value: 'bottomLeft'},
         {label: 'Bottom Center', value: 'bottomCenter'},
-        {label: 'Bottom Right', value: 'bottomRight'},
+        {label: 'Bottom Right', value: 'bottomRight'}
+    ];
+    $scope.fontWtOptions = [
+        {label: 'Light', value: 'light'},
+        {label: 'Normal', value: 'normal'},
+        {label: 'Demi Bold', value: 'demiBold'},
+        {label: 'Bold', value: 'bold'},
+        {label: 'Black', value: 'black'}
+    ];
+    $scope.layoutTypeOptions = [
+        {label: 'Horizontal', value: 'horizontal'},
+        {label: 'Vertical', value: 'vertical'},
+        {label: 'Auto', value: 'auto'}
     ];
 
     //when user changes the value from dialog this will update the css of src area
@@ -116,7 +128,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         }
     }, true);
 
-    //add new source Area to model
+    //add new source Area to model with default values
     $scope.addSourceArea = function () {
         var id = generateUUId();
         var srcArea = {
@@ -133,17 +145,17 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                     channelId: ""
                 },
                 border: {
-                    thickness: "",
+                    thickness: 0,
                     color: "",
                     blinkSpeed: $scope.blinkSpeedOptions[0]
                 },
                 annotation: {
                     text: "",
-                    size: 0,
+                    size: 20,
                     font: {
-                        wt: 0,
+                        wt: $scope.fontWtOptions[1],
                         italic: false,
-                        position:  $scope.fontPosOptions[4],
+                        position: $scope.fontPosOptions[4],
                         color: "",
                         bgColor: ""
                     }
@@ -176,6 +188,16 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     //send model data for layout to server for adding layout
     $scope.saveLayout = function () {
+        /* Notes: Insertion will have only one sourceRef always.
+         If image is chosen for Insert it will override the deviceId/channelId given in dialog window
+         For now the UI datamodel will be flat: Laoyout>Insertion>sourceRef/border/annotation/(region settings)
+         No hierarchical data so layout will have Inserts and Regions sorted on the basis of z-index
+         Insert of type regions will have no sourceRef, it will only have attributes.
+         If user is creating a region and chooses an image we will add insertion before the region with sourceRef.
+         Region element will always be created a fresh inside this method with attributes picked from layout.insertion[signal]
+
+         There should be recalculation of WH on the basis of previous zindex item which is confusing in the requirement.
+         */
         var layoutName = $scope.layoutMaster.text;
         var layoutData = $scope.layoutMaster.value;
         if (layoutData) {
@@ -187,11 +209,15 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             angular.forEach(layoutData, function (value) {
                 var insert = value.insertion;
                 var insertVO = {
+                    "type": insert.type,
                     "x": (insert.posX) / $scope.canvasW,
                     "y": ($scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
                     "width": (insert.width / $scope.canvasW),
                     "height": (insert.height / $scope.canvasH),
-                    "sourceRef": insert.sourceRef
+                    "sourceRef": insert.sourceRef,
+                    "region":insert.region,
+                    "annotation":insert.annotation,
+                    "border":insert.border
                 };
                 var file = value.bgImageFile;
                 if (file) {
