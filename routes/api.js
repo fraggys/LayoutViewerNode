@@ -4,7 +4,7 @@ var cngClient = require('../lib/cngClient');
 
 /* GET API listing. */
 
-/*return compostion list*/
+/*return composition list*/
 router.get('/compositions', function (req, res, next) {
     cngClient.client.getCompositions(function (result) {
         res.json(result);
@@ -33,50 +33,113 @@ router.post('/layout', function (req, res, next) {
         "$": {
             "title": data.title
         },
-        "Insertion": []
+        "Insertion": [],
+        "Region": []
     };
+
     if (data.Insertion) {
+        var cngCmdArr = []; //it will contain list of insertion or region in order they need to be shown.
         for (var i = 0; i < data.Insertion.length; i += 1) {
+            //NOTE: IMPORTANT server will create a Insertion,for bg Image, with dimensions same as parent insert/region.
             var insert = data.Insertion[i];
-            //wait we need to add sources in CNG with actual dir path and append sourceref in layout before saving layout to
-            //cng....get file handle from "bgImageFileName"
-            var bkgFileName = insert.bgImgName + insert.bgImgExt;
-            var deviceId, channelId;
-            if (bkgFileName) {
+            if (insert.bgImgName) {
+                var bkgFileName = insert.bgImgName + insert.bgImgExt;
                 var bkgFileLocalPath = process.cwd() + "\\" + "public\\uploads\\" + bkgFileName;
-                var bkgFileURL = req.protocol + "://" + req.get('host') + "/images/" + bkgFileName;
-                //add source to cng and create SourceRef for this Insertion.
-                var srcDetArr = insert.bgImgName.split("_");
-                cngClient.client.addSource("localImage", insert.bgImgName, srcDetArr[0], srcDetArr[1], bkgFileLocalPath, "true", "", "false", function (result) {
-                    console.log(result);
+                //var bkgFileURL = req.protocol + "://" + req.get('host') + "/images/" + bkgFileName;
+                cngClient.client.addSource("localImage", insert.bgImgName, insert.id, 0, bkgFileLocalPath, "true", "", "false", function (result) {
                 });
-                deviceId = insert.sourceRef.deviceId || srcDetArr[0];
-                channelId = insert.sourceRef.channelId || srcDetArr[1];
+                var bkgInsertion = createInsertion(insert.x, insert.y, insert.width, insert.height, data.title, insert.id);
+                cngCmdArr.push(bkgInsertion);
             }
-            //user will either upload bgImage or give deviceId and channelId for bg
-            //if deviceId and channelId both are present override uploaded image with text fields.
-            layout.Insertion.push({
-                "$": {
-                    "x": insert.x,
-                    "y": insert.y,
-                    "width": insert.width,
-                    "height": insert.height
-                },
-                "SourceRef": {
-                    "$": {
-                        "deviceId": deviceId,
-                        "channelId": channelId
+            if (insert.type === 'Region') {
+                //create Region
+                cngCmdArr.push({
+                    Region: {
+                        "$": {
+                            x: insert.x,
+                            y: insert.y,
+                            width: insert.width,
+                            height: insert.height,
+                            layoutType: insert.region.layoutType,
+                            usedForSourcesOfTypesOrWithTag: insert.region.extraTag
+                        }
                     }
+                });
+            }
+            else if (insert.type == "Insertion") {
+                if (!!insert.sourceRef && !!insert.sourceRef.deviceId && !!insert.sourceRef.channelId) {
+                    //no sourceRef no Insertion.
+                    var newInsertion = createInsertion(insert.x, insert.y, insert.width, insert.height, insert.sourceRef.deviceId, insert.sourceRef.channelId);
+                    //annotation - text provided
+                    if (insert.annotation.text) {
+                        newInsertion.Annotation = {
+                            $: {
+                                fontSize: insert.size,
+                                text: insert.text,
+                                fontItalic: insert.italic,
+                                position: insert.position,
+                                fontWeight: insert.wt
+                            },
+                            Color: createColor(insert.annotation.color),
+                            BackgroundColor: createColor(insert.annotation.bgColor)
+                        };
+                    }
+                    //border - if thickness given
+                    if (insert.border.thickness > 0) {
+                        newInsertion.Border = {
+                            "$": {
+                                thickness: insert.border.thickness,
+                                blink: !!insert.border.blinkSpeed,
+                                blinkRate: insert.border.blinkSpeed
+                            },
+                            Color: createColor(insert.border.color)
+                        }
+                    }
+                    cngCmdArr.push(newInsertion);
                 }
-            });
+            }
         }
+        console.log(cngCmdArr);
         cngClient.client.addLayout(layout, function (result) {
             res.send("success");
         });
-    } else {
+        function createColor(hash) {
+            var hashVal = (hash.charAt(0) == "#") ? hash.substring(1, 7) : hash;
+            return {
+                "$": {
+                    red: parseInt((hashVal.substring(0, 2)), 16),
+                    green: parseInt((hashVal.substring(2, 4)), 16),
+                    blue: parseInt((hashVal.substring(4, 6)), 16),
+                    alpha: 0
+                }
+            };
+        }
+
+        function createInsertion(x, y, w, h, deviceId, channelId) {
+            return {
+                "Insertion": {
+                    "$": {
+                        "x": x,
+                        "y": y,
+                        "width": w,
+                        "height": h
+                    },
+                    "SourceRef": {
+                        "$": {
+                            "deviceId": deviceId,
+                            "channelId": channelId
+                        }
+                    }
+                }
+            };
+        }
+
+    }
+    else {
         res.send("invalid data");
     }
-});
+})
+;
 
 router.post('/upload', function (req, res) {
     //Upload file to server.

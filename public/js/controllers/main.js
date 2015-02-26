@@ -143,18 +143,16 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 border: {
                     thickness: 0,
                     color: "",
-                    blinkSpeed: $scope.blinkSpeedOptions[0]
+                    blinkSpeed: $scope.blinkSpeedOptions[0].value
                 },
                 annotation: {
                     text: "",
                     size: 20,
-                    font: {
-                        wt: $scope.fontWtOptions[1],
-                        italic: false,
-                        position: $scope.fontPosOptions[4],
-                        color: "",
-                        bgColor: ""
-                    }
+                    wt: $scope.fontWtOptions[1].value,
+                    italic: false,
+                    position: $scope.fontPosOptions[4].value,
+                    color: "",
+                    bgColor: ""
                 }
             }
         };
@@ -197,15 +195,16 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             angular.forEach(layoutData, function (value) {
                 var insert = value.insertion;
                 var insertVO = {
+                    "id": value.id,
                     "type": insert.type,
                     "x": (insert.posX) / $scope.canvasW,
                     "y": ($scope.canvasH - insert.height - insert.posY) / $scope.canvasH,
                     "width": (insert.width / $scope.canvasW),
                     "height": (insert.height / $scope.canvasH),
                     "sourceRef": insert.sourceRef,
-                    "region":insert.region,
-                    "annotation":insert.annotation,
-                    "border":insert.border
+                    "region": insert.region,
+                    "annotation": insert.annotation,
+                    "border": insert.border
                 };
                 var file = value.bgImageFile;
                 if (file) {
@@ -223,8 +222,8 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             console.dir(layout);
             /*looks like uploading blob is not supported in $http switching to AJAX only chrome pls */
             var request = new XMLHttpRequest();
-             request.open("POST", "/api/layout");
-             request.send(formData);
+            request.open("POST", "/api/layout");
+            request.send(formData);
         }
     };
 

@@ -69,19 +69,19 @@
             <label for="annSize">Size:</label>
             <input id="annSize" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.size"><br/>
             <label for="annFntWt">Font Weight:</label>
-            <select id="annFntWt" ng-model="layoutMaster.value[currentId].insertion.annotation.font.wt"
+            <select id="annFntWt" ng-model="layoutMaster.value[currentId].insertion.annotation.wt"
                     ng-options="opt.value as opt.label for opt in fontWtOptions">
             </select><br/>
             <label for="annFntIt">Font Italic:</label>
-            <input id="annFntIt" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.font.italic"><br/>
+            <input id="annFntIt" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.italic"><br/>
             <label for="annFntPos">Font Position:</label>
-            <select id="annFntPos" ng-model="layoutMaster.value[currentId].insertion.annotation.font.position"
+            <select id="annFntPos" ng-model="layoutMaster.value[currentId].insertion.annotation.position"
                     ng-options="opt.value as opt.label for opt in fontPosOptions">
             </select><br/>
             <label for="annFntClr">Font Color:</label>
-            <input id="annFntClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.font.color"><br/>
+            <input id="annFntClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.color"><br/>
             <label for="annBgClr">Background Color:</label>
-            <input id="annBgClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.font.bgColor"><br/>
+            <input id="annBgClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.bgColor"><br/>
         </fieldset>
     </div>
 </div>
