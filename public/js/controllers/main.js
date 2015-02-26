@@ -140,10 +140,6 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 width: "",
                 height: "",
                 zIndex: "",
-                sourceRef: {
-                    deviceId: "",
-                    channelId: ""
-                },
                 border: {
                     thickness: 0,
                     color: "",
@@ -188,16 +184,8 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
 
     //send model data for layout to server for adding layout
     $scope.saveLayout = function () {
-        /* Notes: Insertion will have only one sourceRef always.
-         If image is chosen for Insert it will override the deviceId/channelId given in dialog window
-         For now the UI datamodel will be flat: Laoyout>Insertion>sourceRef/border/annotation/(region settings)
-         No hierarchical data so layout will have Inserts and Regions sorted on the basis of z-index
-         Insert of type regions will have no sourceRef, it will only have attributes.
-         If user is creating a region and chooses an image we will add insertion before the region with sourceRef.
-         Region element will always be created a fresh inside this method with attributes picked from layout.insertion[signal]
-
-         There should be recalculation of WH on the basis of previous zindex item which is confusing in the requirement.
-         */
+        //send everything to server UI doesn't care it's a insertion or a region.
+        // If a bkgImage is chosen and SourceType selected is region then server will create an insertion for region.
         var layoutName = $scope.layoutMaster.text;
         var layoutData = $scope.layoutMaster.value;
         if (layoutData) {
@@ -234,9 +222,9 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             formData.append("layout", JSON.stringify(layout));
             console.dir(layout);
             /*looks like uploading blob is not supported in $http switching to AJAX only chrome pls */
-            /* var request = new XMLHttpRequest();
+            var request = new XMLHttpRequest();
              request.open("POST", "/api/layout");
-             request.send(formData);*/
+             request.send(formData);
         }
     };
 

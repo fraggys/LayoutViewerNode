@@ -35,18 +35,26 @@
             <input id="width" type="text" ng-model="layoutMaster.value[currentId].insertion.width"><br/>
             <label for="height">Height:</label>
             <input id="height" type="text" ng-model="layoutMaster.value[currentId].insertion.height"><br/>
-            <h4>Background Image:</h4>
+            <label for="bgImage">Choose Image File:</label>
+            <input id="bgImage" type="file" accept="image/*" file-reader><br/>
+            <h4>Source Details:</h4>
             <hr>
-            <h5>Existing Source Info: </h5>
             <label for="deviceId">Device ID:</label>
             <input id="deviceId" type="text" ng-model="layoutMaster.value[currentId].insertion.sourceRef.deviceId"><br/>
             <label for="channelId">Channel ID:</label>
             <input id="channelId" type="text" ng-model="layoutMaster.value[currentId].insertion.sourceRef.channelId"><br/>
-            <h5>OR: </h5>
-            <label for="bgImage">Choose Image File:</label>
-            <input id="bgImage" type="file" accept="image/*" file-reader><br/>
-            <h4>Source Border Properties:</h4>
+            <h6>OR: </h6>
+            <label for="signalType">Signal Type(";" separated):</label>
+            <input id="signalType" type="text" ng-model="layoutMaster.value[currentId].insertion.region.signalType"><br/>
+            <label for="extraTag">Size:</label>
+            <input id="extraTag" type="text" ng-model="layoutMaster.value[currentId].insertion.region.extraTag"><br/>
+            <label for="layoutType">Layout Type:</label>
+            <select id="layoutType" ng-model="layoutMaster.value[currentId].insertion.region.layoutType"
+                    ng-options="opt.value as opt.label for opt in layoutTypeOptions">
+            </select><br/>
+            <h4>Decorator Details:</h4>
             <hr>
+            <h5>Border Properties:</h5>
             <label for="borderWt">Border Thickness</label>
             <input id="borderWt" type="text" ng-model="layoutMaster.value[currentId].insertion.border.thickness"><br>
             <label for="borderClr">Border Color:</label>
@@ -55,8 +63,7 @@
             <select id="borderBlink" ng-model="layoutMaster.value[currentId].insertion.border.blinkSpeed"
                     ng-options="opt.value as opt.label for opt in blinkSpeedOptions">
             </select><br/>
-            <h4>Source Annotation Properties:</h4>
-            <hr>
+            <h5>Annotation Properties:</h5><br/>
             <label for="annText">Text:</label>
             <input id="annText" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.text"><br/>
             <label for="annSize">Size:</label>
@@ -75,16 +82,6 @@
             <input id="annFntClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.font.color"><br/>
             <label for="annBgClr">Background Color:</label>
             <input id="annBgClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.font.bgColor"><br/>
-            <h4>Region Settings:</h4>
-            <hr>
-            <label for="signalType">Text:</label>
-            <input id="signalType" type="text" ng-model="layoutMaster.value[currentId].insertion.region.signalType"><br/>
-            <label for="extraTag">Size:</label>
-            <input id="extraTag" type="text" ng-model="layoutMaster.value[currentId].insertion.region.extraTag"><br/>
-            <label for="layoutType">Layout Type:</label>
-            <select id="layoutType" ng-model="layoutMaster.value[currentId].insertion.region.layoutType"
-                    ng-options="opt.value as opt.label for opt in layoutTypeOptions">
-            </select><br/>
         </fieldset>
     </div>
 </div>
