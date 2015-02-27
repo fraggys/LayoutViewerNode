@@ -32,7 +32,8 @@ router.post('/layout', function (req, res, next) {
     var layout = {
         "$": {
             "title": data.title
-        }
+        },
+        Insertion: []
     };
 
     if (data.Insertion) {
@@ -40,43 +41,48 @@ router.post('/layout', function (req, res, next) {
         for (var i = 0; i < data.Insertion.length; i += 1) {
             //NOTE: IMPORTANT server will create a Insertion,for bg Image, with dimensions same as parent insert/region.
             var insert = data.Insertion[i];
+            //create a bg insertion
+            var child;
+            var bkgInsertion = createInsertion(insert.x, insert.y, insert.width, insert.height);
             if (insert.bgImgName) {
                 var bkgFileName = insert.bgImgName + insert.bgImgExt;
                 var bkgFileLocalPath = process.cwd() + "\\" + "public\\uploads\\" + bkgFileName;
                 //var bkgFileURL = req.protocol + "://" + req.get('host') + "/images/" + bkgFileName;
-                /*cngClient.client.addSource("localImage", insert.bgImgName, insert.id, 0, bkgFileLocalPath, "true", "", "false", function (result) {
-                });*/
-                var bkgInsertion = createInsertion(insert.x, insert.y, insert.width, insert.height, data.title, insert.id);
-                cngCmdArr.push(bkgInsertion);
+                cngClient.client.addSource("localImage", insert.bgImgName, data.title, insert.id, bkgFileLocalPath, "true", "", "false", function (result) {
+                    //anything after add source.
+                 });
+                bkgInsertion["SourceRef"] = createSourceRef(data.title, insert.id);
             }
             if (insert.type === 'Region') {
-                //create Region
-                cngCmdArr.push({
-                    Region: {
-                        "$": {
-                            x: insert.x,
-                            y: insert.y,
-                            width: insert.width,
-                            height: insert.height,
-                            layoutType: insert.region.layoutType,
-                            usedForSourcesOfTypesOrWithTag: insert.region.extraTag
-                        }
+                //create Region Element
+                child = {
+                    $: {
+                        x: insert.x,
+                        y: insert.y,
+                        width: insert.width,
+                        height: insert.height,
+                        layoutType: insert.region.layoutType,
+                        usedForSourcesOfTypesOrWithTag: insert.region.extraTag
                     }
-                });
+                };
+                bkgInsertion["Region"] = child;
             }
             else if (insert.type == "Insertion") {
+                var newInsertion = "";
+                //no sourceRef no new Insertion and no decorators
                 if (!!insert.sourceRef && !!insert.sourceRef.deviceId && !!insert.sourceRef.channelId) {
-                    //no sourceRef no Insertion.
-                    var newInsertion = createInsertion(insert.x, insert.y, insert.width, insert.height, insert.sourceRef.deviceId, insert.sourceRef.channelId);
+                    newInsertion = createInsertion(insert.x, insert.y, insert.width, insert.height);
+                    //Create SourceRef
+                    newInsertion["SourceRef"] = createSourceRef(insert.sourceRef.deviceId, insert.sourceRef.channelId)
                     //annotation - text provided
                     if (insert.annotation.text) {
-                        newInsertion.Annotation = {
+                        newInsertion["Annotation"] = {
                             $: {
-                                fontSize: insert.size,
-                                text: insert.text,
-                                fontItalic: insert.italic,
-                                position: insert.position,
-                                fontWeight: insert.wt
+                                fontSize: insert.annotation.size,
+                                text: insert.annotation.text,
+                                fontItalic: insert.annotation.italic,
+                                position: insert.annotation.position,
+                                fontWeight: insert.annotation.wt
                             },
                             Color: createColor(insert.annotation.color),
                             BackgroundColor: createColor(insert.annotation.bgColor)
@@ -84,54 +90,61 @@ router.post('/layout', function (req, res, next) {
                     }
                     //border - if thickness given
                     if (insert.border.thickness > 0) {
-                        newInsertion.Border = {
-                            "$": {
+                        var border = {
+                            $: {
                                 thickness: insert.border.thickness,
-                                blink: !!insert.border.blinkSpeed,
-                                blinkRate: insert.border.blinkSpeed
                             },
                             Color: createColor(insert.border.color)
                         }
+                        if(!!insert.border.blinkSpeed){
+                            border.blink = !!insert.border.blinkSpeed;
+                            border.blinkRate =insert.border.blinkSpeed
+                        }
+                        newInsertion["Border"] = border;
                     }
-                    cngCmdArr.push(newInsertion);
+                    bkgInsertion["Insertion"] = newInsertion;
                 }
             }
+            layout.Insertion.push(bkgInsertion);
         }
-        console.log(cngCmdArr);
-        /*cngClient.client.addLayout(layout, function (result) {
+        console.log(JSON.stringify(layout));
+        cngClient.client.addLayout(layout, function (result) {
             res.send("success");
-        });*/
+        });
+
         function createColor(hash) {
-            var hashVal = (hash.charAt(0) == "#") ? hash.substring(1, 7) : hash;
+            if (hash) {
+                var hashVal = (hash.charAt(0) == "#") ? hash.substring(1, 7) : hash;
+                return {
+                    "$": {
+                        red: parseInt((hashVal.substring(0, 2)), 16),
+                        green: parseInt((hashVal.substring(2, 4)), 16),
+                        blue: parseInt((hashVal.substring(4, 6)), 16),
+                        alpha: 0
+                    }
+                };
+            }
+        }
+
+        function createInsertion(x, y, w, h) {
             return {
                 "$": {
-                    red: parseInt((hashVal.substring(0, 2)), 16),
-                    green: parseInt((hashVal.substring(2, 4)), 16),
-                    blue: parseInt((hashVal.substring(4, 6)), 16),
-                    alpha: 0
+                    "x": x,
+                    "y": y,
+                    "width": w,
+                    "height": h
                 }
             };
         }
 
-        function createInsertion(x, y, w, h, deviceId, channelId) {
+        function createSourceRef(deviceId, channelId) {
             return {
-                "Insertion": {
-                    "$": {
-                        "x": x,
-                        "y": y,
-                        "width": w,
-                        "height": h
-                    },
-                    "SourceRef": {
-                        "$": {
-                            "deviceId": deviceId,
-                            "channelId": channelId
-                        }
-                    }
+                "$": {
+                    "deviceId": deviceId,
+                    "channelId": channelId
                 }
-            };
+            }
         }
-        res.send("success");
     }
     else {
         res.send("invalid data");

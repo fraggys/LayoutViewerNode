@@ -87,7 +87,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         {label: 'Region', value: 'Region'}
     ];
     $scope.blinkSpeedOptions = [
-        {label: 'None', value: 'None'},
+        {label: 'None', value: ""},
         {label: 'Super Slow', value: 'superSlow'},
         {label: 'Slow', value: 'slow'},
         {label: 'Medium', value: 'medium'},
@@ -151,7 +151,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                 zIndex: "",
                 border: {
                     thickness: 0,
-                    color: "",
+                    color: "#000000",
                     blinkSpeed: $scope.blinkSpeedOptions[0].value
                 },
                 annotation: {
@@ -160,8 +160,8 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
                     wt: $scope.fontWtOptions[1].value,
                     italic: false,
                     position: $scope.fontPosOptions[4].value,
-                    color: "",
-                    bgColor: ""
+                    color: "#000000",
+                    bgColor: "#000000"
                 }
             }
         };

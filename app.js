@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+var winston = require('winston');
+var expressWinston = require('express-winston');
 
 var routes = require('./routes/index');
 var api = require('./routes/api');
@@ -17,6 +19,26 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(favicon(__dirname + '/public/images/favicon.ico'));
+app.use(expressWinston.logger({
+    transports: [
+        new winston.transports.File({
+            json: true,
+            colorize: true,
+            filename: path.join(__dirname,'/logs/app.log')
+        })
+    ],
+    exitOnError: false
+}));
+
+app.use(expressWinston.errorLogger({
+    transports: [
+        new winston.transports.Console({
+            json: true,
+            colorize: true,
+            filename:path.join(__dirname, '/logs/err.log')
+        })
+    ],exitOnError: false
+}));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
