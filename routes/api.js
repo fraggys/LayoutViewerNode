@@ -32,9 +32,7 @@ router.post('/layout', function (req, res, next) {
     var layout = {
         "$": {
             "title": data.title
-        },
-        "Insertion": [],
-        "Region": []
+        }
     };
 
     if (data.Insertion) {
@@ -46,8 +44,8 @@ router.post('/layout', function (req, res, next) {
                 var bkgFileName = insert.bgImgName + insert.bgImgExt;
                 var bkgFileLocalPath = process.cwd() + "\\" + "public\\uploads\\" + bkgFileName;
                 //var bkgFileURL = req.protocol + "://" + req.get('host') + "/images/" + bkgFileName;
-                cngClient.client.addSource("localImage", insert.bgImgName, insert.id, 0, bkgFileLocalPath, "true", "", "false", function (result) {
-                });
+                /*cngClient.client.addSource("localImage", insert.bgImgName, insert.id, 0, bkgFileLocalPath, "true", "", "false", function (result) {
+                });*/
                 var bkgInsertion = createInsertion(insert.x, insert.y, insert.width, insert.height, data.title, insert.id);
                 cngCmdArr.push(bkgInsertion);
             }
@@ -100,9 +98,9 @@ router.post('/layout', function (req, res, next) {
             }
         }
         console.log(cngCmdArr);
-        cngClient.client.addLayout(layout, function (result) {
+        /*cngClient.client.addLayout(layout, function (result) {
             res.send("success");
-        });
+        });*/
         function createColor(hash) {
             var hashVal = (hash.charAt(0) == "#") ? hash.substring(1, 7) : hash;
             return {
@@ -133,7 +131,7 @@ router.post('/layout', function (req, res, next) {
                 }
             };
         }
-
+        res.send("success");
     }
     else {
         res.send("invalid data");

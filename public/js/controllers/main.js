@@ -37,6 +37,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
             primary: "ui-icon-disk"
         }
     });
+    $("#annFntIt").button();
 
     //keep parentElemDimensions in the scope
     var parentElem = $(".parent")[0];
@@ -114,6 +115,14 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         {label: 'Auto', value: 'auto'}
     ];
 
+    $scope.showRegionSettings = function(){
+        if($scope.currentId) {
+            return $scope.layoutMaster.value[$scope.currentId].insertion.type === "Region";
+        }
+        else {
+            return false;
+        }
+    };
     //when user changes the value from dialog this will update the css of src area
     $scope.$watch('layoutMaster.value[currentId]', function (newVal) {
         if (newVal) {
@@ -134,7 +143,7 @@ layoutEditorApp.controller('MainCtrl', function ($scope, $http) {
         var srcArea = {
             id: id,
             insertion: {
-                type: "",
+                type:$scope.srcTypeOptions[0].value ,
                 posX: "",
                 posY: "",
                 width: "",

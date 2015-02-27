@@ -1,5 +1,5 @@
 <div class="ui-widget-header ui-corner-all">
-    <label class="text headerElem">Barco</label>
+    <label class="text1 headerElem">Barco</label>
     <select ng-model="layoutMaster"
             ng-options="opt as opt.label for opt in options" class="headerElem">
     </select>
@@ -15,73 +15,95 @@
     <div id="dialogWindow" title="Source Properties" class="ui-widget" jui-dialog jui-options='{
         "dialog": {
             "autoOpen": false,
+            "width": 550,
             "height": 700,
-            "width": 700,
             "modal": true,
             "resizable": false,
             "draggable": true
         }
     }'>
         <fieldset>
-            <label for="srcType">Source Type: </label>
+            <label for="srcType">Source Type </label>
             <select id="srcType" ng-model="layoutMaster.value[currentId].insertion.type"
-                    ng-options="opt.value as opt.label for opt in srcTypeOptions">
-            </select><br/>
-            <label for="posX">X:</label>
-            <input id="posX" type="text" ng-model="layoutMaster.value[currentId].insertion.posX"><br/>
-            <label for="posY">Y:</label>
-            <input id="posY" type="text" ng-model="layoutMaster.value[currentId].insertion.posY"><br/>
-            <label for="width">Width:</label>
-            <input id="width" type="text" ng-model="layoutMaster.value[currentId].insertion.width"><br/>
-            <label for="height">Height:</label>
-            <input id="height" type="text" ng-model="layoutMaster.value[currentId].insertion.height"><br/>
-            <label for="bgImage">Choose Image File:</label>
-            <input id="bgImage" type="file" accept="image/*" file-reader><br/>
-            <h4>Source Details:</h4>
+                    ng-options="opt.value as opt.label for opt in srcTypeOptions"
+                    class="text ui-widget-content ui-corner-all">
+            </select>
+            <label for="posX">X</label>
+            <input id="posX" type="number" ng-model="layoutMaster.value[currentId].insertion.posX" min="0"
+                   max="{{canvasW-layoutMaster.value[currentId].insertion.width-4}}"
+                   class="text ui-widget-content ui-corner-all">
+            <label for="posY">Y</label>
+            <input id="posY" type="number" ng-model="layoutMaster.value[currentId].insertion.posY" min="0"
+                   max="{{canvasH-layoutMaster.value[currentId].insertion.height-4}}"
+                   class="text ui-widget-content ui-corner-all">
+            <label for="width">Width</label>
+            <input id="width" type="text" ng-model="layoutMaster.value[currentId].insertion.width"
+                   class="text ui-widget-content ui-corner-all">
+            <label for="height">Height</label>
+            <input id="height" type="text" ng-model="layoutMaster.value[currentId].insertion.height"
+                   class="text ui-widget-content ui-corner-all">
+            <label for="bgImage">Background Image</label>
+            <input id="bgImage" type="file" accept="image/*" file-reader>
+            <h4>Source Details</h4>
             <hr>
-            <label for="deviceId">Device ID:</label>
-            <input id="deviceId" type="text" ng-model="layoutMaster.value[currentId].insertion.sourceRef.deviceId"><br/>
-            <label for="channelId">Channel ID:</label>
-            <input id="channelId" type="text" ng-model="layoutMaster.value[currentId].insertion.sourceRef.channelId"><br/>
-            <h6>OR: </h6>
-            <label for="signalType">Signal Type(";" separated):</label>
-            <input id="signalType" type="text" ng-model="layoutMaster.value[currentId].insertion.region.signalType"><br/>
-            <label for="extraTag">Size:</label>
-            <input id="extraTag" type="text" ng-model="layoutMaster.value[currentId].insertion.region.extraTag"><br/>
-            <label for="layoutType">Layout Type:</label>
-            <select id="layoutType" ng-model="layoutMaster.value[currentId].insertion.region.layoutType"
-                    ng-options="opt.value as opt.label for opt in layoutTypeOptions">
-            </select><br/>
-            <h4>Decorator Details:</h4>
-            <hr>
-            <h5>Border Properties:</h5>
-            <label for="borderWt">Border Thickness</label>
-            <input id="borderWt" type="text" ng-model="layoutMaster.value[currentId].insertion.border.thickness"><br>
-            <label for="borderClr">Border Color:</label>
-            <input id="borderClr" type="color" ng-model="layoutMaster.value[currentId].insertion.border.color"><br>
-            <label for="borderBlink">Border Blink Speed:</label>
-            <select id="borderBlink" ng-model="layoutMaster.value[currentId].insertion.border.blinkSpeed"
-                    ng-options="opt.value as opt.label for opt in blinkSpeedOptions">
-            </select><br/>
-            <h5>Annotation Properties:</h5><br/>
-            <label for="annText">Text:</label>
-            <input id="annText" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.text"><br/>
-            <label for="annSize">Size:</label>
-            <input id="annSize" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.size"><br/>
-            <label for="annFntWt">Font Weight:</label>
-            <select id="annFntWt" ng-model="layoutMaster.value[currentId].insertion.annotation.wt"
-                    ng-options="opt.value as opt.label for opt in fontWtOptions">
-            </select><br/>
-            <label for="annFntIt">Font Italic:</label>
-            <input id="annFntIt" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.italic"><br/>
-            <label for="annFntPos">Font Position:</label>
-            <select id="annFntPos" ng-model="layoutMaster.value[currentId].insertion.annotation.position"
-                    ng-options="opt.value as opt.label for opt in fontPosOptions">
-            </select><br/>
-            <label for="annFntClr">Font Color:</label>
-            <input id="annFntClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.color"><br/>
-            <label for="annBgClr">Background Color:</label>
-            <input id="annBgClr" type="color" ng-model="layoutMaster.value[currentId].insertion.annotation.bgColor"><br/>
+            <div ng-hide="showRegionSettings()">
+                <label for="deviceId">Device ID</label>
+                <input id="deviceId" type="text" ng-model="layoutMaster.value[currentId].insertion.sourceRef.deviceId"
+                       class="text ui-widget-content ui-corner-all">
+                <label for="channelId">Channel ID</label>
+                <input id="channelId" type="text" ng-model="layoutMaster.value[currentId].insertion.sourceRef.channelId"
+                       class="text ui-widget-content ui-corner-all">
+            </div>
+            <div ng-show="showRegionSettings()">
+                <label for="signalType">Signal Type(";" separated)</label>
+                <input id="signalType" type="text" ng-model="layoutMaster.value[currentId].insertion.region.extraTag"
+                       class="text ui-widget-content ui-corner-all">
+                <label for="layoutType">Layout Type</label>
+                <select id="layoutType" ng-model="layoutMaster.value[currentId].insertion.region.layoutType"
+                        ng-options="opt.value as opt.label for opt in layoutTypeOptions">
+                </select>
+            </div>
+            <div ng-hide="showRegionSettings()" id="decorator">
+                <h4>Decorator Details</h4>
+                <hr>
+                <h5>Border Properties</h5>
+                <label for="borderWt">Thickness </label>
+                <input id="borderWt" type="number"
+                       ng-model="layoutMaster.value[currentId].insertion.border.thickness" min="0" max="20"
+                       class="ui-widget-content ui-corner-all">
+                <label for="borderClr" style="display: inline-block">Color </label>
+                <input id="borderClr" type="color" ng-model="layoutMaster.value[currentId].insertion.border.color">
+                <label for="borderBlink">Blink Speed</label>
+                <select id="borderBlink" ng-model="layoutMaster.value[currentId].insertion.border.blinkSpeed"
+                        ng-options="opt.value as opt.label for opt in blinkSpeedOptions">
+                </select>
+                <h5>Annotation Properties</h5>
+                <label for="annText">Text</label>
+                <input id="annText" type="text" ng-model="layoutMaster.value[currentId].insertion.annotation.text"
+                       class="text ui-widget-content ui-corner-all">
+                <label for="annSize">Size</label>
+                <input id="annSize" type="number" ng-model="layoutMaster.value[currentId].insertion.annotation.size"
+                       min="8" max="30"
+                       class="ui-widget-content ui-corner-all">
+                <label for="annFntIt">I</label>
+                <input id="annFntIt" type="checkbox"
+                       ng-model="layoutMaster.value[currentId].insertion.annotation.italic">
+
+                <label for="annFntWt">Font Weight</label>
+                <select id="annFntWt" ng-model="layoutMaster.value[currentId].insertion.annotation.wt"
+                        ng-options="opt.value as opt.label for opt in fontWtOptions">
+                </select>
+                <label for="annFntPos">Font Position</label>
+                <select id="annFntPos" ng-model="layoutMaster.value[currentId].insertion.annotation.position"
+                        ng-options="opt.value as opt.label for opt in fontPosOptions">
+                </select>
+                <label for="annFntClr">Font Color</label>
+                <input id="annFntClr" type="color"
+                       ng-model="layoutMaster.value[currentId].insertion.annotation.color">
+                <label for="annBgClr">Background Color</label>
+                <input id="annBgClr" type="color"
+                       ng-model="layoutMaster.value[currentId].insertion.annotation.bgColor">
+            </div>
         </fieldset>
     </div>
 </div>
